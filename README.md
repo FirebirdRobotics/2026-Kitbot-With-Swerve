@@ -1,3 +1,4 @@
 Built off of AdvantagekitTalonFX Swerve Template
-Workin on  
+
+Workin on:
 Integrate advantagekit kitbot template in 
