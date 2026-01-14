@@ -13,6 +13,8 @@ import static frc.robot.util.SparkUtil.*;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -29,6 +31,9 @@ public class SuperstructureIOSpark implements SuperstructureIO {
   private final SparkMax intakeLauncher = new SparkMax(intakeLauncherCanId, MotorType.kBrushless);
   private final RelativeEncoder feederEncoder = feeder.getEncoder();
   private final RelativeEncoder intakeLauncherEncoder = intakeLauncher.getEncoder();
+  private final SparkClosedLoopController feederController = feeder.getClosedLoopController();
+  private final SparkClosedLoopController launcherController =
+      intakeLauncher.getClosedLoopController();
 
   public SuperstructureIOSpark() {
     var feederConfig = new SparkMaxConfig();
@@ -36,6 +41,12 @@ public class SuperstructureIOSpark implements SuperstructureIO {
         .idleMode(IdleMode.kBrake)
         .smartCurrentLimit(feederCurrentLimit)
         .voltageCompensation(12.0);
+    feederConfig
+        .closedLoop
+        .p(kFeederP)
+        .i(kFeederI)
+        .d(kFeederD)
+        .outputRange(kFeederMinOutput, kFeederMaxOutput);
     feederConfig
         .encoder
         .positionConversionFactor(
@@ -63,6 +74,12 @@ public class SuperstructureIOSpark implements SuperstructureIO {
         .velocityConversionFactor((2.0 * Math.PI) / 60.0 / intakeLauncherMotorReduction)
         .uvwMeasurementPeriod(10)
         .uvwAverageDepth(2);
+    intakeLauncherConfig
+        .closedLoop
+        .p(kLauncherP)
+        .i(kLauncherI)
+        .d(kLauncherD)
+        .outputRange(kLauncherMinOutput, kLauncherMaxOutput);
     tryUntilOk(
         intakeLauncher,
         5,
@@ -103,11 +120,11 @@ public class SuperstructureIOSpark implements SuperstructureIO {
 
   @Override
   public void setFeederVoltage(double volts) {
-    feeder.setVoltage(volts);
+    feederController.setSetpoint(volts, ControlType.kVoltage);
   }
 
   @Override
   public void setIntakeLauncherVoltage(double volts) {
-    intakeLauncher.setVoltage(volts);
+    launcherController.setSetpoint(volts, ControlType.kVoltage);
   }
 }
