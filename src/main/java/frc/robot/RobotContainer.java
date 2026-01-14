@@ -27,6 +27,7 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.SuperstructureIO;
 import frc.robot.subsystems.superstructure.SuperstructureIOSim;
+import frc.robot.subsystems.superstructure.SuperstructureIOSpark;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -79,7 +80,7 @@ public class RobotContainer {
         // new ModuleIOTalonFXS(TunerConstants.BackLeft),
         // new ModuleIOTalonFXS(TunerConstants.BackRight));
 
-        superstructure = new Superstructure(new SuperstructureIO() {});
+        superstructure = new Superstructure(new SuperstructureIOSpark() {});
         break;
 
       case SIM:
