@@ -128,7 +128,11 @@ public class SuperstructureIOSpark implements SuperstructureIO {
     intakeLauncher.setVoltage(volts);
   }
 
-  public void setIntakeLauncherVelocity(double velocity){
+  public void setFeederVelocity(double velocity){
+    feederController.setSetpoint(velocity, ControlType.kVelocity);
+  }
+
+  public void setIntakeLauncherVelocity(double velocity) {
     launcherController.setSetpoint(velocity, ControlType.kVelocity);
   }
 }
