@@ -34,5 +34,4 @@ public class SuperstructureConstants {
   public static final double kLauncherD = 0.001;
   public static final double kLauncherMinOutput = 0;
   public static final double kLauncherMaxOutput = 10;
-
 }
