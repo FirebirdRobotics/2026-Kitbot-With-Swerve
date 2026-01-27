@@ -29,10 +29,10 @@ import frc.robot.subsystems.superstructure.SuperstructureIO;
 import frc.robot.subsystems.superstructure.SuperstructureIOSim;
 import frc.robot.subsystems.superstructure.SuperstructureIOSpark;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import frc.robot.subsystems.vision.VisionConstants;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -72,8 +72,10 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVision(VisionConstants.camera0Name, VisionConstants.robotToCamera0),
-                new VisionIOPhotonVision(VisionConstants.camera1Name, VisionConstants.robotToCamera1));
+                new VisionIOPhotonVision(
+                    VisionConstants.camera0Name, VisionConstants.robotToCamera0),
+                new VisionIOPhotonVision(
+                    VisionConstants.camera1Name, VisionConstants.robotToCamera1));
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -109,8 +111,10 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
-                new VisionIOPhotonVisionSim(VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose));
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose));
 
         superstructure = new Superstructure(new SuperstructureIOSim());
         break;
@@ -206,5 +210,14 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  /**
+   * Use this to pass the current pose to the main {@link Robot} class.
+   *
+   * @return the current Pose2d
+   */
+  public Pose2d getPose2d() {
+    return drive.getPose();
   }
 }
