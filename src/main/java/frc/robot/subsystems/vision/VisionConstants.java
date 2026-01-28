@@ -32,6 +32,10 @@ public class VisionConstants {
   public static double maxAmbiguity = 0.3;
   public static double maxZError = 0.75;
 
+  // Field measurements
+  public static double fieldCenterX = 8.270494;
+  public static double fieldCenterY = 4.034663;
+
   // Standard deviation baselines, for 1 meter distance and 1 tag
   // (Adjusted automatically based on distance and # of tags)
   public static double linearStdDevBaseline = 0.02; // Meters

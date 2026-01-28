@@ -18,6 +18,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.LinkedList;
@@ -56,6 +57,31 @@ public class Vision extends SubsystemBase {
    */
   public Rotation2d getTargetX(int cameraIndex) {
     return inputs[cameraIndex].latestTargetObservation.tx();
+  }
+
+  /**
+   * Returns angle to center of field
+   *
+   * @param currentRobotPose Current Pose2d of robot
+   * @return angle The angle to the center of the field
+   */
+  public Rotation2d getAngleToCenter(Pose2d currentRobotPose) {
+    double x1 = currentRobotPose.getX();
+    double y1 = currentRobotPose.getY();
+
+    double dx = fieldCenterX - x1;
+    double dy = fieldCenterY - y1;
+
+    double angle = (Math.PI / 2) - Math.atan2(dx, dy);
+
+    if (angle < 0.0) {
+      angle = angle + (2 * Math.PI);
+    }
+
+    SmartDashboard.putNumber("Angle", angle);
+
+    Rotation2d rot = new Rotation2d(angle);
+    return rot;
   }
 
   @Override

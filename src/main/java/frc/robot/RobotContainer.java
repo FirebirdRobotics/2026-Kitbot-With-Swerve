@@ -173,7 +173,7 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // Lock to 0° when A button is held
+    // Lock to center of field when A button is held
     controller
         .a()
         .whileTrue(
@@ -181,7 +181,7 @@ public class RobotContainer {
                 drive,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
-                () -> Rotation2d.kZero));
+                () -> vision.getAngleToCenter(getPose2d())));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
