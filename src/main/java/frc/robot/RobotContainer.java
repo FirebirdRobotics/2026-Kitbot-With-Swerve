@@ -176,15 +176,9 @@ public class RobotContainer {
     // Lock to center of field when A button is held
     controller
         .a()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(
-                                drive.getPose().getTranslation(),
-                                vision.getAngleToCenter(drive.getPose()))),
-                    drive)
-                .ignoringDisable(true));
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive, () -> 0, () -> 0, () -> vision.getAngleToCenter(drive.getPose())));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
