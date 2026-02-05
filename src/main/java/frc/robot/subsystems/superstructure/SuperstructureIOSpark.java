@@ -63,9 +63,9 @@ public class SuperstructureIOSpark implements SuperstructureIO {
 
     var intakeLauncherConfig = new SparkMaxConfig();
     intakeLauncherConfig
-        .idleMode(IdleMode.kBrake)
+        .idleMode(IdleMode.kCoast)
         .smartCurrentLimit(intakeLauncherCurrentLimit)
-        .inverted(true)
+        .inverted(false)
         .voltageCompensation(12.0);
     intakeLauncherConfig
         .encoder
@@ -79,7 +79,9 @@ public class SuperstructureIOSpark implements SuperstructureIO {
         .p(kLauncherP)
         .i(kLauncherI)
         .d(kLauncherD)
-        .outputRange(kLauncherMinOutput, kLauncherMaxOutput);
+        .outputRange(kLauncherMinOutput, kLauncherMaxOutput)
+        .feedForward
+        .kV(kLauncherV);
     tryUntilOk(
         intakeLauncher,
         5,
@@ -133,6 +135,6 @@ public class SuperstructureIOSpark implements SuperstructureIO {
   }
 
   public void setIntakeLauncherVelocity(double velocity) {
-    launcherController.setSetpoint(velocity, ControlType.kVelocity);
+    launcherController.setSetpoint(125, ControlType.kVelocity);
   }
 }

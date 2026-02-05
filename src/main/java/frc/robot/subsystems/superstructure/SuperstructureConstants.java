@@ -19,7 +19,7 @@ public class SuperstructureConstants {
   public static final double intakingFeederVoltage = -12.0;
   public static final double intakingIntakeVoltage = 10.0;
   public static final double launchingFeederVoltage = 9.0;
-  public static final double launchingLauncherVoltage = 10.6;
+  public static final double launchingLauncherVoltage = -3;
   public static final double spinUpFeederVoltage = -6.0;
   public static final double spinUpSeconds = 1.0;
 
@@ -29,9 +29,12 @@ public class SuperstructureConstants {
   public static final double kFeederMinOutput = 0;
   public static final double kFeederMaxOutput = 10;
 
-  public static final double kLauncherP = 0.01;
-  public static final double kLauncherI = 0;
-  public static final double kLauncherD = 0.001;
+  public static final double kLauncherV = 0.025;
+  public static final double kLauncherP = 0.0000;
+  public static final double kLauncherI = 0.00;
+  public static final double kLauncherD = 0;
   public static final double kLauncherMinOutput = 0;
   public static final double kLauncherMaxOutput = 10;
+
+  public static final double controlSystemsVelocityRadPerSec = 125.0;
 }
