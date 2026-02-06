@@ -45,7 +45,8 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Superstructure superstructure;
-  private final Vision vision;
+  // private final Vision vision;
+  Vision vision;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -73,9 +74,7 @@ public class RobotContainer {
             new Vision(
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVision(
-                    VisionConstants.camera0Name, VisionConstants.robotToCamera0),
-                new VisionIOPhotonVision(
-                    VisionConstants.camera1Name, VisionConstants.robotToCamera1));
+                    VisionConstants.cameraName, VisionConstants.robotToCamera));
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -112,9 +111,7 @@ public class RobotContainer {
             new Vision(
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVisionSim(
-                    VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose));
+                    VisionConstants.cameraName, VisionConstants.robotToCamera, drive::getPose));
 
         superstructure = new Superstructure(new SuperstructureIOSim());
         break;
@@ -178,7 +175,10 @@ public class RobotContainer {
         .a()
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
-                drive, () -> 0, () -> 0, () -> vision.getAngleToCenter(drive.getPose())));
+                drive,
+                () -> 0,
+                () -> 0,
+                () -> new Rotation2d(vision.getAngleToCenter(drive.getPose()))));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
