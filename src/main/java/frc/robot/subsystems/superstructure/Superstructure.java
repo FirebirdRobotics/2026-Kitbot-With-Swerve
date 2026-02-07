@@ -78,7 +78,6 @@ public class Superstructure extends SubsystemBase {
             });
   }
 
-  /** Set the rollers to the values for launching. Spins up before feeding fuel. */
   public Command launchWithPID() {
     return run(
         () -> {
