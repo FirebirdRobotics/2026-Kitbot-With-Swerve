@@ -29,12 +29,12 @@ public class SuperstructureConstants {
   public static final double kFeederMinOutput = 0;
   public static final double kFeederMaxOutput = 10;
 
-  public static final double kLauncherV = -0.024;
-  public static final double kLauncherP = 0.0000;
+  public static final double kLauncherV = 0.0221;
+  public static final double kLauncherP = 0.001;
   public static final double kLauncherI = 0.00;
   public static final double kLauncherD = 0;
   public static final double kLauncherMinOutput = -10;
   public static final double kLauncherMaxOutput = 10;
 
-  public static final double controlSystemsVelocityRadPerSec = -344.0;
+  public static final double controlSystemsVelocityRadPerSec = -344.0; // -400
 }
