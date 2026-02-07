@@ -178,12 +178,20 @@ public class RobotContainer {
     controller.leftBumper().whileTrue(superstructure.intake());
     controller.rightBumper().whileTrue(superstructure.launch());
     controller.a().whileTrue(superstructure.eject());
+
     controller
         .y()
         .whileTrue(
-            Commands.run(
-                () ->
-                    superstructure.io.setIntakeLauncherVelocity(-controlSystemsVelocityRadPerSec)));
+            Commands.startEnd(
+                () -> {
+                  superstructure.io.setIntakeLauncherVelocity(controlSystemsVelocityRadPerSec);
+                  superstructure.io.setFeederVoltage(10);
+                },
+                () -> {
+                  superstructure.io.setIntakeLauncherVoltage(0);
+                  superstructure.io.setFeederVoltage(0);
+                },
+                superstructure));
   }
 
   /**
