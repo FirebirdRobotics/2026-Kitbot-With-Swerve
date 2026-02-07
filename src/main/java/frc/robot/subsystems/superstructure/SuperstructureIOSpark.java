@@ -40,6 +40,7 @@ public class SuperstructureIOSpark implements SuperstructureIO {
     feederConfig
         .idleMode(IdleMode.kBrake)
         .smartCurrentLimit(feederCurrentLimit)
+        .inverted(true)
         .voltageCompensation(12.0);
     feederConfig
         .closedLoop
@@ -65,7 +66,7 @@ public class SuperstructureIOSpark implements SuperstructureIO {
     intakeLauncherConfig
         .idleMode(IdleMode.kCoast)
         .smartCurrentLimit(intakeLauncherCurrentLimit)
-        .inverted(false)
+        .inverted(true)
         .voltageCompensation(12.0);
     intakeLauncherConfig
         .encoder
