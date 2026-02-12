@@ -97,9 +97,7 @@ public class SuperstructureIOSpark implements SuperstructureIO {
         .p(kLauncherP)
         .i(kLauncherI)
         .d(kLauncherD)
-        .outputRange(kLauncherMinOutput, kLauncherMaxOutput)
-        .feedForward
-        .kV(kLauncherV);
+        .outputRange(kLauncherMinOutput, kLauncherMaxOutput);
     tryUntilOk(
         intakeLauncher,
         5,
