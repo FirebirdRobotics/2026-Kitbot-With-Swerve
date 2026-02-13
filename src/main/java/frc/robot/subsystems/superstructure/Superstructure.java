@@ -7,6 +7,7 @@
 
 package frc.robot.subsystems.superstructure;
 
+import static frc.robot.subsystems.superstructure.SuperstructureConstants.controlSystemsVelocityRadPerSec;
 import static frc.robot.subsystems.superstructure.SuperstructureConstants.intakingFeederVoltage;
 import static frc.robot.subsystems.superstructure.SuperstructureConstants.launchingFeederVoltage;
 import static frc.robot.subsystems.superstructure.SuperstructureConstants.launchingLauncherVoltage;
@@ -18,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
 public class Superstructure extends SubsystemBase {
-  private final SuperstructureIO io;
+  public final SuperstructureIO io;
   private final SuperstructureIOInputsAutoLogged inputs = new SuperstructureIOInputsAutoLogged();
 
   public Superstructure(SuperstructureIO io) {
@@ -75,5 +76,12 @@ public class Superstructure extends SubsystemBase {
               io.setFeederVoltage(0.0);
               io.setIntakeLauncherVoltage(0.0);
             });
+  }
+
+  public Command launchWithPID() {
+    return run(
+        () -> {
+          io.setIntakeLauncherVelocity(controlSystemsVelocityRadPerSec);
+        });
   }
 }

@@ -7,8 +7,25 @@
 
 package frc.robot.subsystems.superstructure;
 
-import static frc.robot.subsystems.superstructure.SuperstructureConstants.*;
-import static frc.robot.util.SparkUtil.*;
+import static frc.robot.subsystems.superstructure.SuperstructureConstants.feederCanId;
+import static frc.robot.subsystems.superstructure.SuperstructureConstants.feederCurrentLimit;
+import static frc.robot.subsystems.superstructure.SuperstructureConstants.feederMotorReduction;
+import static frc.robot.subsystems.superstructure.SuperstructureConstants.intakeLauncherCanId;
+import static frc.robot.subsystems.superstructure.SuperstructureConstants.intakeLauncherCurrentLimit;
+import static frc.robot.subsystems.superstructure.SuperstructureConstants.intakeLauncherMotorReduction;
+import static frc.robot.subsystems.superstructure.SuperstructureConstants.kFeederD;
+import static frc.robot.subsystems.superstructure.SuperstructureConstants.kFeederI;
+import static frc.robot.subsystems.superstructure.SuperstructureConstants.kFeederMaxOutput;
+import static frc.robot.subsystems.superstructure.SuperstructureConstants.kFeederMinOutput;
+import static frc.robot.subsystems.superstructure.SuperstructureConstants.kFeederP;
+import static frc.robot.subsystems.superstructure.SuperstructureConstants.kLauncherD;
+import static frc.robot.subsystems.superstructure.SuperstructureConstants.kLauncherI;
+import static frc.robot.subsystems.superstructure.SuperstructureConstants.kLauncherMaxOutput;
+import static frc.robot.subsystems.superstructure.SuperstructureConstants.kLauncherMinOutput;
+import static frc.robot.subsystems.superstructure.SuperstructureConstants.kLauncherP;
+import static frc.robot.subsystems.superstructure.SuperstructureConstants.kLauncherV;
+import static frc.robot.util.SparkUtil.ifOk;
+import static frc.robot.util.SparkUtil.tryUntilOk;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
@@ -40,6 +57,7 @@ public class SuperstructureIOSpark implements SuperstructureIO {
     feederConfig
         .idleMode(IdleMode.kBrake)
         .smartCurrentLimit(feederCurrentLimit)
+        .inverted(true)
         .voltageCompensation(12.0);
     feederConfig
         .closedLoop
@@ -63,7 +81,7 @@ public class SuperstructureIOSpark implements SuperstructureIO {
 
     var intakeLauncherConfig = new SparkMaxConfig();
     intakeLauncherConfig
-        .idleMode(IdleMode.kBrake)
+        .idleMode(IdleMode.kCoast)
         .smartCurrentLimit(intakeLauncherCurrentLimit)
         .inverted(true)
         .voltageCompensation(12.0);
@@ -79,7 +97,9 @@ public class SuperstructureIOSpark implements SuperstructureIO {
         .p(kLauncherP)
         .i(kLauncherI)
         .d(kLauncherD)
-        .outputRange(kLauncherMinOutput, kLauncherMaxOutput);
+        .outputRange(kLauncherMinOutput, kLauncherMaxOutput)
+        .feedForward
+        .kV(kLauncherV);
     tryUntilOk(
         intakeLauncher,
         5,
@@ -135,4 +155,5 @@ public class SuperstructureIOSpark implements SuperstructureIO {
   public void setIntakeLauncherVelocity(double velocity) {
     launcherController.setSetpoint(velocity, ControlType.kVelocity);
   }
+
 }

@@ -31,4 +31,6 @@ public interface SuperstructureIO {
 
   /** Run the intake and launcher at the specified voltage. */
   public default void setIntakeLauncherVoltage(double volts) {}
+
+  public default void setIntakeLauncherVelocity(double velocity) {}
 }
