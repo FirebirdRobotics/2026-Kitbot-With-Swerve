@@ -283,11 +283,15 @@ public class DriveCommands {
   }
 
   /* Points robot towards target. */
-  public static Command joystickRotateToward(Drive drive, Translation2d targetTranslation2d) {
+  public static Command joystickRotateToward(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      Translation2d targetTranslation2d) {
     return joystickDriveAtAngle(
         drive,
-        () -> 0,
-        () -> 0,
+        xSupplier,
+        ySupplier,
         () ->
             new Rotation2d(
                 (Math.PI / 2)
