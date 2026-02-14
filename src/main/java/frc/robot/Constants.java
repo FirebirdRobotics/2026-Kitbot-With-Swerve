@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -28,4 +29,7 @@ public final class Constants {
     /** Replaying from a log file. */
     REPLAY
   }
+
+  // Field measurements
+  public static Translation2d fieldCenterTarget = new Translation2d(8.270494, 4.034663);
 }

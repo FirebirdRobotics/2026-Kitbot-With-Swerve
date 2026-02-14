@@ -180,7 +180,7 @@ public class RobotContainer {
                 drive,
                 () -> 0,
                 () -> 0,
-                () -> new Rotation2d(vision.getAngleToCenter(drive.getPose()))));
+                () -> new Rotation2d(drive.getAngleToCenter(drive.getPose()))));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));

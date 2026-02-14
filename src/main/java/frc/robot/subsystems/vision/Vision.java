@@ -14,7 +14,6 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
@@ -57,30 +56,6 @@ public class Vision extends SubsystemBase {
    */
   public Rotation2d getTargetX(int cameraIndex) {
     return inputs[cameraIndex].latestTargetObservation.tx();
-  }
-
-  /**
-   * Returns angle from robot to object
-   *
-   * @param currentRobotPose Current Pose2d of robot
-   * @param targetTranslation Current Translation2d of target
-   * @return The angle to the target
-   */
-  public double getAngleToTarget(Pose2d currentRobotPose, Translation2d targetTranslation) {
-    return (Math.PI / 2)
-        - Math.atan2(
-            targetTranslation.getX() - currentRobotPose.getX(),
-            targetTranslation.getY() - currentRobotPose.getY());
-  }
-
-  /**
-   * Returns angle to center of field
-   *
-   * @param currentRobotPose Current Pose2d of robot
-   * @return The angle to the center of the field
-   */
-  public double getAngleToCenter(Pose2d currentRobotPose) {
-    return getAngleToTarget(currentRobotPose, fieldCenterTarget);
   }
 
   @Override
