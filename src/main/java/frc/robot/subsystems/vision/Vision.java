@@ -65,14 +65,9 @@ public class Vision extends SubsystemBase {
    * @return The angle to the center of the field
    */
   public double getAngleToCenter(Pose2d currentRobotPose) {
-    double a =
-        (Math.PI / 2)
-            - Math.atan2(
-                fieldCenterX - currentRobotPose.getX(), fieldCenterY - currentRobotPose.getY());
-
-    // a = (a < 0) ? (a + Math.PI) : a;
-
-    return a;
+    return (Math.PI / 2)
+              - Math.atan2(
+                  fieldCenterX - currentRobotPose.getX(), fieldCenterY - currentRobotPose.getY());
   }
 
   @Override
