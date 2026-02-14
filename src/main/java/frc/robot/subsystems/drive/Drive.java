@@ -356,28 +356,4 @@ public class Drive extends SubsystemBase {
       new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
     };
   }
-
-  /**
-   * Returns angle from robot to object
-   *
-   * @param currentRobotPose Current Pose2d of robot
-   * @param targetTranslation Current Translation2d of target
-   * @return The angle to the target
-   */
-  public double getAngleToTarget(Pose2d currentRobotPose, Translation2d targetTranslation) {
-    return (Math.PI / 2)
-        - Math.atan2(
-            targetTranslation.getX() - currentRobotPose.getX(),
-            targetTranslation.getY() - currentRobotPose.getY());
-  }
-
-  /**
-   * Returns angle to center of field
-   *
-   * @param currentRobotPose Current Pose2d of robot
-   * @return The angle to the center of the field
-   */
-  public double getAngleToCenter(Pose2d currentRobotPose) {
-    return getAngleToTarget(currentRobotPose, Constants.fieldCenterTarget);
-  }
 }

@@ -282,6 +282,20 @@ public class DriveCommands {
                     })));
   }
 
+  /* Points robot towards target. */
+  public static Command joystickRotateToward(Drive drive, Translation2d targetTranslation2d) {
+    return joystickDriveAtAngle(
+        drive,
+        () -> 0,
+        () -> 0,
+        () ->
+            new Rotation2d(
+                (Math.PI / 2)
+                    - Math.atan2(
+                        targetTranslation2d.getX() - drive.getPose().getX(),
+                        targetTranslation2d.getY() - drive.getPose().getY())));
+  }
+
   private static class WheelRadiusCharacterizationState {
     double[] positions = new double[4];
     Rotation2d lastAngle = Rotation2d.kZero;
