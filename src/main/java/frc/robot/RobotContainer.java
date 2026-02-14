@@ -199,7 +199,7 @@ public class RobotContainer {
     // Control bindings for superstructure
     controller.leftBumper().whileTrue(superstructure.intake());
     controller.rightBumper().whileTrue(superstructure.launch());
-    controller.a().whileTrue(superstructure.eject());
+    controller.rightTrigger().whileTrue(superstructure.eject());
 
     controller
         .y()
