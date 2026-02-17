@@ -48,8 +48,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Superstructure superstructure;
-  // private final Vision vision;
-  Vision vision;
+  private final Vision vision;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
