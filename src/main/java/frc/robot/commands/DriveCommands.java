@@ -22,15 +22,15 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.drive.Drive;
 import frc.robot.Constants;
+import frc.robot.subsystems.drive.Drive;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-import java.util.Optional;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
@@ -309,10 +309,10 @@ public class DriveCommands {
       DoubleSupplier ySupplier,
       Supplier<Optional<Alliance>> aSupplier) {
     return aSupplier.get().isPresent()
-      ? (aSupplier.get().get() == Alliance.Red
-          ? joystickRotateToward(drive, xSupplier, ySupplier, Constants.redHubTarget)
-          : joystickRotateToward(drive, xSupplier, ySupplier, Constants.blueHubTarget))
-      : joystickDrive(drive, xSupplier, ySupplier, () -> 0);
+        ? (aSupplier.get().get() == Alliance.Red
+            ? joystickRotateToward(drive, xSupplier, ySupplier, Constants.redHubTarget)
+            : joystickRotateToward(drive, xSupplier, ySupplier, Constants.blueHubTarget))
+        : joystickDrive(drive, xSupplier, ySupplier, () -> 0);
   }
 
   private static class WheelRadiusCharacterizationState {
