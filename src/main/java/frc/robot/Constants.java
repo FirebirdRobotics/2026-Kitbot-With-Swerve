@@ -32,4 +32,6 @@ public final class Constants {
 
   // Field measurements
   public static Translation2d fieldCenterTarget = new Translation2d(8.270494, 4.034663);
+  public static Translation2d redHubTarget = new Translation2d(4.625594,4.034536);
+  public static Translation2d blueHubTarget = new Translation2d(4.625594,4.034536);
 }
