@@ -7,20 +7,19 @@
 
 package frc.robot;
 
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import static frc.robot.subsystems.superstructure.SuperstructureConstants.controlSystemsVelocityRadPerSec;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
@@ -38,7 +37,7 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import static frc.robot.subsystems.superstructure.SuperstructureConstants.controlSystemsVelocityRadPerSec;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -182,7 +181,13 @@ public class RobotContainer {
                 drive,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
-                () -> (DriverStation.getAlliance().isPresent() ? DriverStation.getAlliance().get() : Alliance.Red) == Alliance.Red ? Constants.redHubTarget : Constants.blueHubTarget));
+                () ->
+                    (DriverStation.getAlliance().isPresent()
+                                ? DriverStation.getAlliance().get()
+                                : Alliance.Red)
+                            == Alliance.Red
+                        ? Constants.redHubTarget
+                        : Constants.blueHubTarget));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -201,13 +206,21 @@ public class RobotContainer {
     // Control bindings for superstructure
     controller.leftBumper().whileTrue(superstructure.intake());
     controller.rightBumper().whileTrue(superstructure.launch());
-    //controller.rightTrigger().whileTrue(superstructure.eject());
-    controller.rightTrigger().whileTrue(
-                                superstructure.shootOnTheFly(
-                                    drive,
-                                    () -> -controller.getLeftY(),
-                                    () -> -controller.getLeftX(),
-                                    () -> (DriverStation.getAlliance().isPresent() ? DriverStation.getAlliance().get() : Alliance.Red) == Alliance.Red ? Constants.redHubTarget : Constants.blueHubTarget));
+    // controller.rightTrigger().whileTrue(superstructure.eject());
+    controller
+        .rightTrigger()
+        .whileTrue(
+            superstructure.shootOnTheFly(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () ->
+                    (DriverStation.getAlliance().isPresent()
+                                ? DriverStation.getAlliance().get()
+                                : Alliance.Red)
+                            == Alliance.Red
+                        ? Constants.redHubTarget
+                        : Constants.blueHubTarget));
 
     controller
         .y()

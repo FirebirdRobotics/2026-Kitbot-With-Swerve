@@ -14,18 +14,16 @@ import static frc.robot.subsystems.superstructure.SuperstructureConstants.launch
 import static frc.robot.subsystems.superstructure.SuperstructureConstants.spinUpFeederVoltage;
 import static frc.robot.subsystems.superstructure.SuperstructureConstants.spinUpSeconds;
 
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
-
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
-
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Superstructure extends SubsystemBase {
@@ -95,47 +93,65 @@ public class Superstructure extends SubsystemBase {
         });
   }
 
-  public Command launchAtVelocity(double vel){
-    return run(
-      () -> {
-        io.setIntakeLauncherVelocity(vel*controlSystemsVelocityRadPerSec);
-      });
+  public Command launchAtVelocity(double vel) {
+    return run(() -> {
+          io.setFeederVoltage(vel * controlSystemsVelocityRadPerSec);
+          io.setIntakeLauncherVoltage(vel * controlSystemsVelocityRadPerSec);
+        })
+        .withTimeout(spinUpSeconds)
+        .andThen(
+            run(
+                () -> {
+                  io.setFeederVoltage(vel * controlSystemsVelocityRadPerSec);
+                  io.setIntakeLauncherVoltage(vel * controlSystemsVelocityRadPerSec);
+                }))
+        .finallyDo(
+            () -> {
+              io.setFeederVoltage(0.0);
+              io.setIntakeLauncherVoltage(0.0);
+            });
   }
 
-  public Command setHoodAngle(double angle){
-    angle = angle+1;
+  public Command setHoodAngle(double angle) {
+    angle = angle + 1;
     return Commands.none();
   }
 
-  public double getShooterSpeed(Double distance){
+  public double getShooterSpeed(Double distance) {
     return distance;
   }
 
   public Command shootOnTheFly(
-    Drive drive,
-    DoubleSupplier xSupplier,
-    DoubleSupplier ySupplier,
-    Supplier<Translation2d> gSupplier
-  ) {
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      Supplier<Translation2d> gSupplier) {
     ChassisSpeeds robotSpeeds = drive.getChassisSpeeds();
 
-    Translation2d futurePose = drive.getPose().getTranslation().plus(
-                                  new Translation2d(
-                                          robotSpeeds.vxMetersPerSecond,
-                                          robotSpeeds.vyMetersPerSecond
-                                  ).times(SuperstructureConstants.latency));
-    
+    Translation2d futurePose =
+        drive
+            .getPose()
+            .getTranslation()
+            .plus(
+                new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond)
+                    .times(SuperstructureConstants.latency+spinUpSeconds));
+
     Translation2d target = gSupplier.get().minus(futurePose);
 
-    Translation2d shot = target.div(target.getNorm())
-                               .times(getShooterSpeed(target.getNorm()))
-                               .minus(new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond));
+    Translation2d shot =
+        target
+            .div(target.getNorm())
+            .times(getShooterSpeed(target.getNorm()))
+            .minus(new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond));
 
     double angle = shot.getAngle().getRadians();
     double speed = shot.getNorm();
-    double pitch = Math.acos(Math.min(speed/SuperstructureConstants.totalExitVelocity, 1.0));
+    double pitch = Math.acos(Math.min(speed / SuperstructureConstants.totalExitVelocity, 1.0));
 
-    return Commands.sequence(DriveCommands.joystickDriveAtAngle(drive, xSupplier, ySupplier, () -> new Rotation2d(angle)),setHoodAngle(pitch),launchAtVelocity(speed));
-
+    return Commands.parallel(
+        DriveCommands.joystickDriveAtAngle(
+            drive, xSupplier, ySupplier, () -> new Rotation2d(angle)),
+        setHoodAngle(pitch),
+        launchAtVelocity(0.1)); // speed
   }
 }
