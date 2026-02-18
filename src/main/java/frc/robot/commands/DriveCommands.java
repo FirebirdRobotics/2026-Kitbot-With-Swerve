@@ -22,13 +22,11 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Constants;
 import frc.robot.subsystems.drive.Drive;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -289,7 +287,7 @@ public class DriveCommands {
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      Translation2d targetTranslation2d) {
+      Supplier<Translation2d> targetTranslation2dSupplier) {
     return joystickDriveAtAngle(
         drive,
         xSupplier,
@@ -298,21 +296,8 @@ public class DriveCommands {
             new Rotation2d(
                 (Math.PI / 2)
                     - Math.atan2(
-                        targetTranslation2d.getX() - drive.getPose().getX(),
-                        targetTranslation2d.getY() - drive.getPose().getY())));
-  }
-
-  /* Points robot towards appropriate reef */
-  public static Command joystickSnapToHub(
-      Drive drive,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
-      Supplier<Optional<Alliance>> aSupplier) {
-    return aSupplier.get().isPresent()
-        ? (aSupplier.get().get() == Alliance.Red
-            ? joystickRotateToward(drive, xSupplier, ySupplier, Constants.redHubTarget)
-            : joystickRotateToward(drive, xSupplier, ySupplier, Constants.blueHubTarget))
-        : joystickDrive(drive, xSupplier, ySupplier, () -> 0);
+                        targetTranslation2dSupplier.get().getX() - drive.getPose().getX(),
+                        targetTranslation2dSupplier.get().getY() - drive.getPose().getY())));
   }
 
   private static class WheelRadiusCharacterizationState {
