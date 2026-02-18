@@ -39,5 +39,5 @@ public class SuperstructureConstants {
   public static final double controlSystemsVelocityRadPerSec = -344.0; // -400
 
   public static final double latency = 0.15;
-  public static final double totalExitVelocity = 15;
+  public static final double totalExitVelocity = 15; // should be rpm for 1 m/s
 }
