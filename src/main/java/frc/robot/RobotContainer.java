@@ -201,7 +201,13 @@ public class RobotContainer {
     // Control bindings for superstructure
     controller.leftBumper().whileTrue(superstructure.intake());
     controller.rightBumper().whileTrue(superstructure.launch());
-    controller.rightTrigger().whileTrue(superstructure.eject());
+    //controller.rightTrigger().whileTrue(superstructure.eject());
+    controller.rightTrigger().whileTrue(
+                                superstructure.shootOnTheFly(
+                                    drive,
+                                    () -> -controller.getLeftY(),
+                                    () -> -controller.getLeftX(),
+                                    () -> (DriverStation.getAlliance().isPresent() ? DriverStation.getAlliance().get() : Alliance.Red) == Alliance.Red ? Constants.redHubTarget : Constants.blueHubTarget));
 
     controller
         .y()
