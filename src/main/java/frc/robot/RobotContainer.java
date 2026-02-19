@@ -12,6 +12,8 @@ import static frc.robot.subsystems.superstructure.SuperstructureConstants.contro
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,6 +32,11 @@ import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.SuperstructureIO;
 import frc.robot.subsystems.superstructure.SuperstructureIOSim;
 import frc.robot.subsystems.superstructure.SuperstructureIOSpark;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOPhotonVision;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -42,6 +49,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Superstructure superstructure;
+  private final Vision vision;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -56,6 +64,7 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         // ModuleIOTalonFX is intended for modules with TalonFX drive, TalonFX turn, and
         // a CANcoder
+
         drive =
             new Drive(
                 new GyroIOPigeon2(),
@@ -63,6 +72,12 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVision(
+                    VisionConstants.cameraName, VisionConstants.robotToCamera));
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -95,6 +110,12 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
 
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.cameraName, VisionConstants.robotToCamera, drive::getPose));
+
         superstructure = new Superstructure(new SuperstructureIOSim());
         break;
 
@@ -107,6 +128,8 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+
+        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
         superstructure = new Superstructure(new SuperstructureIO() {});
         break;
@@ -150,15 +173,21 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // Lock to 0° when A button is held
+    // Lock to center of field when A button is held
     controller
         .a()
         .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
+            DriveCommands.joystickRotateToward(
                 drive,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
-                () -> Rotation2d.kZero));
+                () ->
+                    (DriverStation.getAlliance().isPresent()
+                                ? DriverStation.getAlliance().get()
+                                : Alliance.Red)
+                            == Alliance.Red
+                        ? Constants.redHubTarget
+                        : Constants.blueHubTarget));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -177,7 +206,21 @@ public class RobotContainer {
     // Control bindings for superstructure
     controller.leftBumper().whileTrue(superstructure.intake());
     controller.rightBumper().whileTrue(superstructure.launch());
-    controller.a().whileTrue(superstructure.eject());
+    // controller.rightTrigger().whileTrue(superstructure.eject());
+    controller
+        .rightTrigger()
+        .whileTrue(
+            superstructure.shootOnTheFly(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () ->
+                    (DriverStation.getAlliance().isPresent()
+                                ? DriverStation.getAlliance().get()
+                                : Alliance.Red)
+                            == Alliance.Red
+                        ? Constants.redHubTarget
+                        : Constants.blueHubTarget));
 
     controller
         .y()
@@ -201,5 +244,14 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  /**
+   * Use this to pass the current pose to the main {@link Robot} class.
+   *
+   * @return The current Pose2d
+   */
+  public Pose2d getPose2d() {
+    return drive.getPose();
   }
 }
