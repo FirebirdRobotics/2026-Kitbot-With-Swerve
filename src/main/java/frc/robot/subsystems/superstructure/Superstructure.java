@@ -127,6 +127,7 @@ public class Superstructure extends SubsystemBase {
       Supplier<Translation2d> gSupplier) {
     InterpolatingDoubleTreeMap shooterSpeedMap = new InterpolatingDoubleTreeMap();
     shooterSpeedMap.put(1.0, 1.0);
+    shooterSpeedMap.put(2.0, 2.0);
 
     ChassisSpeeds robotSpeeds = drive.getChassisSpeeds();
 
