@@ -14,17 +14,20 @@ import static frc.robot.subsystems.superstructure.SuperstructureConstants.launch
 import static frc.robot.subsystems.superstructure.SuperstructureConstants.spinUpFeederVoltage;
 import static frc.robot.subsystems.superstructure.SuperstructureConstants.spinUpSeconds;
 
-import edu.wpi.first.math.geometry.Rotation2d;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
+import frc.robot.commands.DriveCommands;
 
 public class Superstructure extends SubsystemBase {
   public final SuperstructureIO io;
@@ -117,15 +120,13 @@ public class Superstructure extends SubsystemBase {
     return Commands.none();
   }
 
-  public double getShooterSpeed(Double distance) {
-    return distance;
-  }
-
   public Command shootOnTheFly(
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       Supplier<Translation2d> gSupplier) {
+    InterpolatingDoubleTreeMap shooterSpeedMap = new InterpolatingDoubleTreeMap();
+
     ChassisSpeeds robotSpeeds = drive.getChassisSpeeds();
 
     Translation2d futurePose =
@@ -141,7 +142,7 @@ public class Superstructure extends SubsystemBase {
     Translation2d shot =
         target
             .div(target.getNorm())
-            .times(getShooterSpeed(target.getNorm()))
+            .times(shooterSpeedMap.get(target.getNorm()))
             .minus(new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond));
 
     double angle = shot.getAngle().getRadians();
@@ -152,6 +153,6 @@ public class Superstructure extends SubsystemBase {
         DriveCommands.joystickDriveAtAngle(
             drive, xSupplier, ySupplier, () -> new Rotation2d(angle)),
         setHoodAngle(pitch),
-        launchAtVelocity(0.1)); // speed
+        launchAtVelocity(speed));
   }
 }
