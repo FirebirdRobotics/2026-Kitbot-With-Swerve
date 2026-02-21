@@ -123,6 +123,7 @@ public class Superstructure extends SubsystemBase {
 
     ChassisSpeeds robotSpeeds = drive.getChassisSpeeds();
 
+    // Calculate where robot will be once we're done processing and actually ready to shoot
     Translation2d futurePose =
         drive
             .getPose()
@@ -131,8 +132,10 @@ public class Superstructure extends SubsystemBase {
                 new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond)
                     .times(SuperstructureConstants.latency));
 
+    // offset
     Translation2d target = gSupplier.get().minus(futurePose);
 
+    // Shot vector (target vector -> normalized -> multiplied by horiz. speed -> subtract robot speed)
     Translation2d shot =
         target
             .div(target.getNorm())
@@ -140,9 +143,13 @@ public class Superstructure extends SubsystemBase {
             .minus(new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond));
 
     double angle = shot.getAngle().getRadians();
-    double groundSpeed = shot.getNorm();
-    double pitch = Math.acos(Math.min(groundSpeed / SuperstructureConstants.totalExitVelocity, 1.0));
 
+    // Find parabola angle to compensate for horizontal speed
+    double pitch = Math.acos(
+                      Math.min(shot.getNorm() / SuperstructureConstants.totalExitVelocity, 
+                             1.0));
+
+    // Parallel because drive at angle takes a while to terminate
     return Commands.parallel(
         DriveCommands.joystickDriveAtAngle(
             drive, xSupplier, ySupplier, () -> new Rotation2d(angle)),
