@@ -13,6 +13,7 @@ import static frc.robot.subsystems.superstructure.SuperstructureConstants.launch
 import static frc.robot.subsystems.superstructure.SuperstructureConstants.launchingLauncherVoltage;
 import static frc.robot.subsystems.superstructure.SuperstructureConstants.spinUpFeederVoltage;
 import static frc.robot.subsystems.superstructure.SuperstructureConstants.spinUpSeconds;
+import static frc.robot.subsystems.superstructure.SuperstructureConstants.totalExitVelocity;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -97,22 +98,11 @@ public class Superstructure extends SubsystemBase {
   }
 
   public Command launchAtVelocity(double vel) {
-    return run(() -> {
-          io.setFeederVoltage(vel * controlSystemsVelocityRadPerSec);
-          io.setIntakeLauncherVoltage(vel * controlSystemsVelocityRadPerSec);
-        })
-        .withTimeout(spinUpSeconds)
-        .andThen(
-            run(
-                () -> {
-                  io.setFeederVoltage(vel * controlSystemsVelocityRadPerSec);
-                  io.setIntakeLauncherVoltage(vel * controlSystemsVelocityRadPerSec);
-                }))
-        .finallyDo(
-            () -> {
-              io.setFeederVoltage(0.0);
-              io.setIntakeLauncherVoltage(0.0);
-            });
+    return run(
+      () -> {
+        io.setIntakeLauncherVelocity(vel);
+      }
+    );
   }
 
   public Command setHoodAngle(double angle) {
@@ -125,6 +115,8 @@ public class Superstructure extends SubsystemBase {
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       Supplier<Translation2d> gSupplier) {
+    // This maps distance to horizontal speed
+    // To calculate these values, we need to try shooting from a fixed (non-zero) angle at different velocities and then record the distance it shoots; only a few data points should be necessary
     InterpolatingDoubleTreeMap shooterSpeedMap = new InterpolatingDoubleTreeMap();
     shooterSpeedMap.put(1.0, 1.0);
     shooterSpeedMap.put(2.0, 2.0);
@@ -137,7 +129,7 @@ public class Superstructure extends SubsystemBase {
             .getTranslation()
             .plus(
                 new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond)
-                    .times(SuperstructureConstants.latency+spinUpSeconds));
+                    .times(SuperstructureConstants.latency));
 
     Translation2d target = gSupplier.get().minus(futurePose);
 
@@ -148,13 +140,13 @@ public class Superstructure extends SubsystemBase {
             .minus(new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond));
 
     double angle = shot.getAngle().getRadians();
-    double speed = shot.getNorm();
-    double pitch = Math.acos(Math.min(speed / SuperstructureConstants.totalExitVelocity, 1.0));
+    double groundSpeed = shot.getNorm();
+    double pitch = Math.acos(Math.min(groundSpeed / SuperstructureConstants.totalExitVelocity, 1.0));
 
     return Commands.parallel(
         DriveCommands.joystickDriveAtAngle(
             drive, xSupplier, ySupplier, () -> new Rotation2d(angle)),
         setHoodAngle(pitch),
-        launchAtVelocity(speed));
+        launchAtVelocity(totalExitVelocity));
   }
 }
