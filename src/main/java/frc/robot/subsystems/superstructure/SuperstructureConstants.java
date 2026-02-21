@@ -7,6 +7,8 @@
 
 package frc.robot.subsystems.superstructure;
 
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+
 public class SuperstructureConstants {
   public static final int feederCanId = 21;
   public static final double feederMotorReduction = 1.0;
@@ -37,4 +39,25 @@ public class SuperstructureConstants {
   public static final double kLauncherMaxOutput = 10;
 
   public static final double controlSystemsVelocityRadPerSec = -344.0; // -400
+
+  public static final double latency = 0.15;
+  public static final double totalExitVelocity = 15; // constant speed
+  public static final double interpolationData[][] = {
+    {1.0, 1.0},
+    {2.0, 2.0}
+  };
+
+  public class SpeedInterpolationMap extends InterpolatingDoubleTreeMap {
+    private InterpolatingDoubleTreeMap map = new InterpolatingDoubleTreeMap();
+
+    public SpeedInterpolationMap() {
+      for (double[] i : interpolationData) {
+        map.put(i[0], i[1]);
+      }
+    }
+
+    public double get(double key) {
+      return map.get(key);
+    }
+  }
 }
