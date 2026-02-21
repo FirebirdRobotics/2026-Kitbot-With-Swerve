@@ -9,7 +9,6 @@ package frc.robot.subsystems.superstructure;
 
 import static frc.robot.subsystems.superstructure.SuperstructureConstants.controlSystemsVelocityRadPerSec;
 import static frc.robot.subsystems.superstructure.SuperstructureConstants.intakingFeederVoltage;
-import static frc.robot.subsystems.superstructure.SuperstructureConstants.interpolationData;
 import static frc.robot.subsystems.superstructure.SuperstructureConstants.launchingFeederVoltage;
 import static frc.robot.subsystems.superstructure.SuperstructureConstants.launchingLauncherVoltage;
 import static frc.robot.subsystems.superstructure.SuperstructureConstants.spinUpFeederVoltage;
@@ -25,7 +24,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.superstructure.SuperstructureConstants.SpeedInterpolationMap;
-
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -117,7 +115,8 @@ public class Superstructure extends SubsystemBase {
     // This maps distance to horizontal speed
     // To calculate these values, we need to try shooting from a fixed (non-zero) angle at different
     // velocities and then record the distance it shoots; only a few data points should be necessary
-    final SpeedInterpolationMap shooterSpeedMap = (new SuperstructureConstants()).new SpeedInterpolationMap();
+    final SpeedInterpolationMap shooterSpeedMap =
+        (new SuperstructureConstants()).new SpeedInterpolationMap();
 
     ChassisSpeeds robotSpeeds = drive.getChassisSpeeds();
 

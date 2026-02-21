@@ -50,13 +50,13 @@ public class SuperstructureConstants {
   public class SpeedInterpolationMap extends InterpolatingDoubleTreeMap {
     private InterpolatingDoubleTreeMap map = new InterpolatingDoubleTreeMap();
 
-    public SpeedInterpolationMap(){
-      for(double[] i : interpolationData){
+    public SpeedInterpolationMap() {
+      for (double[] i : interpolationData) {
         map.put(i[0], i[1]);
       }
     }
 
-    public double get(double key){
+    public double get(double key) {
       return map.get(key);
     }
   }
