@@ -13,21 +13,20 @@ import static frc.robot.subsystems.superstructure.SuperstructureConstants.launch
 import static frc.robot.subsystems.superstructure.SuperstructureConstants.launchingLauncherVoltage;
 import static frc.robot.subsystems.superstructure.SuperstructureConstants.spinUpFeederVoltage;
 import static frc.robot.subsystems.superstructure.SuperstructureConstants.spinUpSeconds;
+import static frc.robot.subsystems.superstructure.SuperstructureConstants.totalExitVelocity;
 
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.Logger;
-
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.drive.Drive;
 import frc.robot.commands.DriveCommands;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.superstructure.SuperstructureConstants.SpeedInterpolationMap;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class Superstructure extends SubsystemBase {
   public final SuperstructureIO io;
@@ -97,22 +96,10 @@ public class Superstructure extends SubsystemBase {
   }
 
   public Command launchAtVelocity(double vel) {
-    return run(() -> {
-          io.setFeederVoltage(vel * controlSystemsVelocityRadPerSec);
-          io.setIntakeLauncherVoltage(vel * controlSystemsVelocityRadPerSec);
-        })
-        .withTimeout(spinUpSeconds)
-        .andThen(
-            run(
-                () -> {
-                  io.setFeederVoltage(vel * controlSystemsVelocityRadPerSec);
-                  io.setIntakeLauncherVoltage(vel * controlSystemsVelocityRadPerSec);
-                }))
-        .finallyDo(
-            () -> {
-              io.setFeederVoltage(0.0);
-              io.setIntakeLauncherVoltage(0.0);
-            });
+    return run(
+        () -> {
+          io.setIntakeLauncherVelocity(vel);
+        });
   }
 
   public Command setHoodAngle(double angle) {
@@ -125,22 +112,28 @@ public class Superstructure extends SubsystemBase {
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       Supplier<Translation2d> gSupplier) {
-    InterpolatingDoubleTreeMap shooterSpeedMap = new InterpolatingDoubleTreeMap();
-    shooterSpeedMap.put(1.0, 1.0);
-    shooterSpeedMap.put(2.0, 2.0);
+    // This maps distance to horizontal speed
+    // To calculate these values, we need to try shooting from a fixed (non-zero) angle at different
+    // velocities and then record the distance it shoots; only a few data points should be necessary
+    final SpeedInterpolationMap shooterSpeedMap =
+        (new SuperstructureConstants()).new SpeedInterpolationMap();
 
     ChassisSpeeds robotSpeeds = drive.getChassisSpeeds();
 
+    // Calculate where robot will be once we're done processing and actually ready to shoot
     Translation2d futurePose =
         drive
             .getPose()
             .getTranslation()
             .plus(
                 new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond)
-                    .times(SuperstructureConstants.latency+spinUpSeconds));
+                    .times(SuperstructureConstants.latency));
 
+    // offset
     Translation2d target = gSupplier.get().minus(futurePose);
 
+    // Shot vector (target vector -> normalized -> multiplied by horiz. speed -> subtract robot
+    // speed)
     Translation2d shot =
         target
             .div(target.getNorm())
@@ -148,13 +141,16 @@ public class Superstructure extends SubsystemBase {
             .minus(new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond));
 
     double angle = shot.getAngle().getRadians();
-    double speed = shot.getNorm();
-    double pitch = Math.acos(Math.min(speed / SuperstructureConstants.totalExitVelocity, 1.0));
 
+    // Find parabola angle to compensate for horizontal speed
+    double pitch =
+        Math.acos(Math.min(shot.getNorm() / SuperstructureConstants.totalExitVelocity, 1.0));
+
+    // Parallel because drive at angle takes a while to terminate
     return Commands.parallel(
         DriveCommands.joystickDriveAtAngle(
             drive, xSupplier, ySupplier, () -> new Rotation2d(angle)),
         setHoodAngle(pitch),
-        launchAtVelocity(speed));
+        launchAtVelocity(totalExitVelocity));
   }
 }
