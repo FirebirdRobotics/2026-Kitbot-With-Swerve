@@ -319,19 +319,25 @@ public class DriveCommands {
   /* Autonomously drives to target pose */
   public static Command autoDriveToPose(Drive drive, Pose2d targetPose2d){
     APTarget target = new APTarget(targetPose2d);
+    ProfiledPIDController angleController =
+        new ProfiledPIDController(5, 0.0, .4, new TrapezoidProfile.Constraints(40, 100));
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
 
     return drive.run(() -> {
       ChassisSpeeds robotSpeeds = drive.getChassisSpeeds();
       Pose2d currentPose = drive.getPose();
       Autopilot.APResult rawOutput = autopilot.calculate(currentPose, robotSpeeds, target);
 
-      drive.drivetrain.setControl(new SwerveRequest.FieldCentricFacingAngle()
-           .withVelocityX(rawOutput.vx())
-           .withVelocityY(rawOutput.vy())
-           .withTargetDirection(rawOutput.targetAngle())
-           .withHeadingPID(4, 0, 0)
+      drive.runVelocity(new ChassisSpeeds(
+        rawOutput.vx().baseUnitMagnitude(),
+        rawOutput.vy().baseUnitMagnitude(),
+        angleController.calculate(
+          drive.getPose().getRotation().getRadians(),
+          rawOutput.targetAngle().getRadians())
+        )
       );
     })
+      .beforeStarting(() -> angleController.reset(drive.getPose().getRotation().getRadians()))
       .until(() -> autopilot.atTarget(drive.getPose(), target))
       .finallyDo(() -> {
         drive.stop();
