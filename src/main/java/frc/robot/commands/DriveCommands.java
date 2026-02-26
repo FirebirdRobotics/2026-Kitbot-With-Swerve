@@ -17,18 +17,27 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
+
+import static edu.wpi.first.units.Units.Centimeter;
+import static edu.wpi.first.units.Units.Degrees;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+
+import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.therekrab.autopilot.*;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
@@ -40,6 +49,13 @@ public class DriveCommands {
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
+
+  private static final APConstraints constraints = new APConstraints(5.0, 2.0);
+  private static final APProfile profile = new APProfile(constraints)
+    .withErrorXY(Distance.ofBaseUnits(2, Centimeter))
+    .withErrorTheta(Angle.ofBaseUnits(0.5, Degrees))
+    .withBeelineRadius(Distance.ofBaseUnits(8, Centimeter));
+  private static final Autopilot autopilot = new Autopilot(profile);
 
   private DriveCommands() {}
 
@@ -298,6 +314,28 @@ public class DriveCommands {
                     - Math.atan2(
                         targetTranslation2dSupplier.get().getX() - drive.getPose().getX(),
                         targetTranslation2dSupplier.get().getY() - drive.getPose().getY())));
+  }
+
+  /* Autonomously drives to target pose */
+  public static Command autoDriveToPose(Drive drive, Pose2d targetPose2d){
+    APTarget target = new APTarget(targetPose2d);
+
+    return drive.run(() -> {
+      ChassisSpeeds robotSpeeds = drive.getChassisSpeeds();
+      Pose2d currentPose = drive.getPose();
+      Autopilot.APResult rawOutput = autopilot.calculate(currentPose, robotSpeeds, target);
+
+      drive.drivetrain.setControl(new SwerveRequest.FieldCentricFacingAngle()
+           .withVelocityX(rawOutput.vx())
+           .withVelocityY(rawOutput.vy())
+           .withTargetDirection(rawOutput.targetAngle())
+           .withHeadingPID(4, 0, 0)
+      );
+    })
+      .until(() -> autopilot.atTarget(drive.getPose(), target))
+      .finallyDo(() -> {
+        drive.stop();
+      });
   }
 
   private static class WheelRadiusCharacterizationState {
