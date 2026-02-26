@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.therekrab.autopilot.*;
 
 public class DriveCommands {
