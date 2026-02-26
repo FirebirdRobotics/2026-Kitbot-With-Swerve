@@ -205,7 +205,10 @@ public class RobotContainer {
 
     // Control bindings for superstructure
     controller.leftBumper().whileTrue(superstructure.intake());
-    controller.rightBumper().whileTrue(superstructure.launch());
+    // controller.rightBumper().whileTrue(superstructure.launch());
+    controller
+        .rightBumper()
+        .onTrue(DriveCommands.autoDriveToPose(drive, new Pose2d(2, 2, new Rotation2d(0))));
     // controller.rightTrigger().whileTrue(superstructure.eject());
     controller
         .rightTrigger()
