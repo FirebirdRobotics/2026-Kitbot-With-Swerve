@@ -153,6 +153,9 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addDefaultOption(
+        "Drive to Start Pose",
+        DriveCommands.autoDriveToPose(drive, Constants.autonomousDestination));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -205,10 +208,7 @@ public class RobotContainer {
 
     // Control bindings for superstructure
     controller.leftBumper().whileTrue(superstructure.intake());
-    // controller.rightBumper().whileTrue(superstructure.launch());
-    controller
-        .rightBumper()
-        .onTrue(DriveCommands.autoDriveToPose(drive, new Pose2d(2, 2, new Rotation2d(0))));
+    controller.rightBumper().whileTrue(superstructure.launch());
     // controller.rightTrigger().whileTrue(superstructure.eject());
     controller
         .rightTrigger()
