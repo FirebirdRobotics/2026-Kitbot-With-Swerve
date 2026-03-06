@@ -28,7 +28,7 @@ public class VisionConstants {
           Units.inchesToMeters(-12.559),
           Units.inchesToMeters(-10.054),
           Units.inchesToMeters(23.439),
-          new Rotation3d(0.0, 0, Math.toRadians(-20)));
+          new Rotation3d(0.0, 0, Math.toRadians(20)));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
