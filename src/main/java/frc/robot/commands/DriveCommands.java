@@ -7,6 +7,10 @@
 
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+
+import com.therekrab.autopilot.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -17,9 +21,12 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
@@ -40,6 +47,14 @@ public class DriveCommands {
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
+
+  private static final APConstraints constraints = new APConstraints(5.0, 2.0);
+  private static final APProfile profile =
+      new APProfile(constraints)
+          .withErrorXY(Distance.ofBaseUnits(0.04, Meters))
+          .withErrorTheta(Angle.ofBaseUnits(0.5, Degrees))
+          .withBeelineRadius(Distance.ofBaseUnits(0.08, Meters));
+  private static final Autopilot autopilot = new Autopilot(profile);
 
   private DriveCommands() {}
 
@@ -280,6 +295,57 @@ public class DriveCommands {
                               + formatter.format(Units.metersToInches(wheelRadius))
                               + " inches");
                     })));
+  }
+
+  /* Points robot towards target. */
+  public static Command joystickRotateToward(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      Supplier<Translation2d> targetTranslation2dSupplier) {
+    return joystickDriveAtAngle(
+        drive,
+        xSupplier,
+        ySupplier,
+        () ->
+            new Rotation2d(
+                (Math.PI / 2)
+                    - Math.atan2(
+                        targetTranslation2dSupplier.get().getX() - drive.getPose().getX(),
+                        targetTranslation2dSupplier.get().getY() - drive.getPose().getY())));
+  }
+
+  /* Autonomously drives to target pose */
+  public static Command autoDriveToPose(Drive drive, Pose2d targetPose2d) {
+    APTarget target = new APTarget(targetPose2d);
+    ProfiledPIDController angleController =
+        new ProfiledPIDController(5, 0.0, .4, new TrapezoidProfile.Constraints(40, 100));
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+
+    return drive
+        .run(
+            () -> {
+              ChassisSpeeds robotSpeeds = drive.getChassisSpeeds();
+              Pose2d currentPose = drive.getPose();
+              Autopilot.APResult rawOutput = autopilot.calculate(currentPose, robotSpeeds, target);
+
+              SmartDashboard.putNumber("AUto Active", 1);
+
+              drive.runVelocity(
+                  new ChassisSpeeds(
+                      rawOutput.vx().baseUnitMagnitude(),
+                      rawOutput.vy().baseUnitMagnitude(),
+                      angleController.calculate(
+                          drive.getPose().getRotation().getRadians(),
+                          rawOutput.targetAngle().getRadians())));
+            })
+        .beforeStarting(() -> angleController.reset(drive.getPose().getRotation().getRadians()))
+        .until(() -> autopilot.atTarget(drive.getPose(), target))
+        .finallyDo(
+            () -> {
+              drive.stop();
+              SmartDashboard.putNumber("AUto Active", 0);
+            });
   }
 
   private static class WheelRadiusCharacterizationState {

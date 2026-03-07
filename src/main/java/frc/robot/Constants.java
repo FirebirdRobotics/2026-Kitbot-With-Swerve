@@ -7,6 +7,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -28,4 +31,13 @@ public final class Constants {
     /** Replaying from a log file. */
     REPLAY
   }
+
+  // Field measurements
+  public static Translation2d fieldCenterTarget = new Translation2d(8.270494, 4.034663);
+  public static Translation2d blueHubTarget = new Translation2d(4.625594, 4.034536);
+  public static Translation2d redHubTarget =
+      new Translation2d(16.540988 - 4.625594, 8.069326 - 4.034536);
+
+  // Autonomous constants
+  public static Pose2d autonomousDestination = new Pose2d(2, 2, new Rotation2d(0.5));
 }
