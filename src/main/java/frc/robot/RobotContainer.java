@@ -28,6 +28,10 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.IntakeIOTalonFX;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.SuperstructureIO;
 import frc.robot.subsystems.superstructure.SuperstructureIOSim;
@@ -50,6 +54,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Superstructure superstructure;
   private final Vision vision;
+  private final Intake intake;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -98,6 +103,7 @@ public class RobotContainer {
         // new ModuleIOTalonFXS(TunerConstants.BackRight));
 
         superstructure = new Superstructure(new SuperstructureIOSpark() {});
+        intake = new Intake(new IntakeIOTalonFX() {});
         break;
 
       case SIM:
@@ -117,6 +123,7 @@ public class RobotContainer {
                     VisionConstants.cameraName, VisionConstants.robotToCamera, drive::getPose));
 
         superstructure = new Superstructure(new SuperstructureIOSim());
+        intake = new Intake(new IntakeIOSim());
         break;
 
       default:
@@ -132,6 +139,7 @@ public class RobotContainer {
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
         superstructure = new Superstructure(new SuperstructureIO() {});
+        intake = new Intake(new IntakeIO() {});
         break;
     }
 
@@ -207,8 +215,23 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
     // Control bindings for superstructure
-    controller.leftBumper().whileTrue(superstructure.intake());
-    controller.rightBumper().whileTrue(superstructure.launch());
+    // controller.leftBumper().whileTrue(superstructure.intake());
+    // controller.rightBumper().whileTrue(superstructure.launch());
+
+    // controller
+    //     .leftBumper()
+    //     .whileTrue(
+    //         Commands.sequence(
+    //             intake.goToDeployedPositionCommand(),
+    //             intake.setRollerMotorPercentOutputCommand(0.5)));
+
+    // Uncomment Above command and comment below command once lintake deploying is fixed
+
+    controller.leftBumper().onTrue(intake.setRollerMotorPercentOutputCommand(0.3));
+    controller.leftBumper().onFalse(intake.setRollerMotorPercentOutputCommand(0));
+
+    // controller.rightBumper().whileTrue(intake.goToFramePerimeterPositionCommand());
+
     // controller.rightTrigger().whileTrue(superstructure.eject());
     controller
         .rightTrigger()
