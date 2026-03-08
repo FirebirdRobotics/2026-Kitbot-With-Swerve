@@ -22,12 +22,20 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.diagonAlley.DiagonAlley;
+import frc.robot.subsystems.diagonAlley.DiagonAlleyIO;
+import frc.robot.subsystems.diagonAlley.DiagonAlleyIOSim;
+import frc.robot.subsystems.diagonAlley.DiagonAlleyIOTalonFX;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.floorRollers.FloorRollers;
+import frc.robot.subsystems.floorRollers.FloorRollersIO;
+import frc.robot.subsystems.floorRollers.FloorRollersIOSim;
+import frc.robot.subsystems.floorRollers.FloorRollersIOTalonFX;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.hood.HoodIO;
 import frc.robot.subsystems.hood.HoodIOSim;
@@ -37,12 +45,17 @@ import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.SuperstructureIO;
 import frc.robot.subsystems.superstructure.SuperstructureIOSim;
 import frc.robot.subsystems.superstructure.SuperstructureIOSpark;
+import frc.robot.subsystems.transfer.Transfer;
+import frc.robot.subsystems.transfer.TransferIO;
+import frc.robot.subsystems.transfer.TransferIOSim;
+import frc.robot.subsystems.transfer.TransferIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
@@ -64,6 +77,9 @@ public class RobotContainer {
   private final Intake intake;
   private final Hood hood;
   private final Shooter shooter;
+  private final Transfer transfer;
+  private final FloorRollers floorRollers;
+  private final DiagonAlley diagonAlley;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -115,6 +131,9 @@ public class RobotContainer {
         intake = new Intake(new IntakeIOTalonFX() {});
         hood = new Hood(new HoodIOTalonFX() {});
         shooter = new Shooter(new ShooterIOTalonFX() {});
+        transfer = new Transfer(new TransferIOTalonFX() {});
+        floorRollers = new FloorRollers(new FloorRollersIOTalonFX() {});
+        diagonAlley = new DiagonAlley(new DiagonAlleyIOTalonFX() {});
 
         break;
 
@@ -138,6 +157,9 @@ public class RobotContainer {
         intake = new Intake(new IntakeIOSim());
         hood = new Hood(new HoodIOSim());
         shooter = new Shooter(new ShooterIOSim());
+        transfer = new Transfer(new TransferIOSim());
+        floorRollers = new FloorRollers(new FloorRollersIOSim());
+        diagonAlley = new DiagonAlley(new DiagonAlleyIOSim());
         break;
 
       default:
@@ -155,7 +177,10 @@ public class RobotContainer {
         superstructure = new Superstructure(new SuperstructureIO() {});
         intake = new Intake(new IntakeIO() {});
         hood = new Hood(new HoodIO() {});
-        shooter = new Shooter(new ShooterIOSim());
+        shooter = new Shooter(new ShooterIO() {});
+        transfer = new Transfer(new TransferIO() {});
+        floorRollers = new FloorRollers(new FloorRollersIO() {});
+        diagonAlley = new DiagonAlley(new DiagonAlleyIO() {});
         break;
     }
 
@@ -249,7 +274,25 @@ public class RobotContainer {
     // controller.leftBumper().onTrue(hood.CommandGoToAngle(0.43)); // Test angle
     // controller.leftBumper().onFalse(hood.CommandGoToLowestAngle());
 
-    controller.leftBumper().onTrue(shooter.setVelocityCommand(5)); // Test angle
+    // controller.leftBumper().onTrue(shooter.setVelocityCommand(5)); // Test angle
+    // controller.leftBumper().onFalse(shooter.setVelocityCommand(0));
+
+    controller
+        .leftBumper()
+        .onTrue(
+            Commands.parallel(
+                transfer.manualRollBackward(0.6),
+                floorRollers.rollInwardsCommand(0.7),
+                shooter.setVelocityCommand(25),
+                diagonAlley.rollOutwards(0.3)));
+    controller
+        .leftBumper()
+        .onFalse(
+            Commands.parallel(
+                transfer.manualRollForwards(0),
+                floorRollers.rollInwardsCommand(0),
+                shooter.setVelocityCommand(0),
+                diagonAlley.Break(0)));
     controller.leftBumper().onFalse(shooter.setVelocityCommand(0));
 
     // controller.rightBumper().whileTrue(intake.goToFramePerimeterPositionCommand());
