@@ -28,6 +28,10 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.hood.Hood;
+import frc.robot.subsystems.hood.HoodIO;
+import frc.robot.subsystems.hood.HoodIOSim;
+import frc.robot.subsystems.hood.HoodIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
@@ -55,6 +59,7 @@ public class RobotContainer {
   private final Superstructure superstructure;
   private final Vision vision;
   private final Intake intake;
+  private final Hood hood;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -104,6 +109,7 @@ public class RobotContainer {
 
         superstructure = new Superstructure(new SuperstructureIOSpark() {});
         intake = new Intake(new IntakeIOTalonFX() {});
+        hood = new Hood(new HoodIOTalonFX() {});
         break;
 
       case SIM:
@@ -124,6 +130,7 @@ public class RobotContainer {
 
         superstructure = new Superstructure(new SuperstructureIOSim());
         intake = new Intake(new IntakeIOSim());
+        hood = new Hood(new HoodIOSim());
         break;
 
       default:
@@ -140,6 +147,7 @@ public class RobotContainer {
 
         superstructure = new Superstructure(new SuperstructureIO() {});
         intake = new Intake(new IntakeIO() {});
+        hood = new Hood(new HoodIO() {});
         break;
     }
 
@@ -227,8 +235,11 @@ public class RobotContainer {
 
     // Uncomment Above command and comment below command once lintake deploying is fixed
 
-    controller.leftBumper().onTrue(intake.setRollerMotorPercentOutputCommand(0.3));
-    controller.leftBumper().onFalse(intake.setRollerMotorPercentOutputCommand(0));
+    // controller.leftBumper().onTrue(intake.setRollerMotorPercentOutputCommand(0.3));
+    // controller.leftBumper().onFalse(intake.setRollerMotorPercentOutputCommand(0));
+
+    controller.leftBumper().onTrue(hood.CommandGoToAngle(0.43)); // Test angle
+    controller.leftBumper().onFalse(hood.CommandGoToLowestAngle());
 
     // controller.rightBumper().whileTrue(intake.goToFramePerimeterPositionCommand());
 
