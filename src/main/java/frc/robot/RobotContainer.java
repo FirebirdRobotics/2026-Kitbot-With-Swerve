@@ -36,6 +36,9 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterIOSim;
+import frc.robot.subsystems.shooter.ShooterIOTalonFX;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.SuperstructureIO;
 import frc.robot.subsystems.superstructure.SuperstructureIOSim;
@@ -60,6 +63,7 @@ public class RobotContainer {
   private final Vision vision;
   private final Intake intake;
   private final Hood hood;
+  private final Shooter shooter;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -110,6 +114,8 @@ public class RobotContainer {
         superstructure = new Superstructure(new SuperstructureIOSpark() {});
         intake = new Intake(new IntakeIOTalonFX() {});
         hood = new Hood(new HoodIOTalonFX() {});
+        shooter = new Shooter(new ShooterIOTalonFX() {});
+
         break;
 
       case SIM:
@@ -131,6 +137,7 @@ public class RobotContainer {
         superstructure = new Superstructure(new SuperstructureIOSim());
         intake = new Intake(new IntakeIOSim());
         hood = new Hood(new HoodIOSim());
+        shooter = new Shooter(new ShooterIOSim());
         break;
 
       default:
@@ -148,6 +155,7 @@ public class RobotContainer {
         superstructure = new Superstructure(new SuperstructureIO() {});
         intake = new Intake(new IntakeIO() {});
         hood = new Hood(new HoodIO() {});
+        shooter = new Shooter(new ShooterIOSim());
         break;
     }
 
@@ -238,8 +246,11 @@ public class RobotContainer {
     // controller.leftBumper().onTrue(intake.setRollerMotorPercentOutputCommand(0.3));
     // controller.leftBumper().onFalse(intake.setRollerMotorPercentOutputCommand(0));
 
-    controller.leftBumper().onTrue(hood.CommandGoToAngle(0.43)); // Test angle
-    controller.leftBumper().onFalse(hood.CommandGoToLowestAngle());
+    // controller.leftBumper().onTrue(hood.CommandGoToAngle(0.43)); // Test angle
+    // controller.leftBumper().onFalse(hood.CommandGoToLowestAngle());
+
+    controller.leftBumper().onTrue(shooter.setVelocityCommand(5)); // Test angle
+    controller.leftBumper().onFalse(shooter.setVelocityCommand(0));
 
     // controller.rightBumper().whileTrue(intake.goToFramePerimeterPositionCommand());
 
