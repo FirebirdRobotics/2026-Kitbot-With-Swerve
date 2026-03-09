@@ -13,7 +13,8 @@ public class HoodIOSim implements HoodIO {
     inputs.pivotPosition = lastPosition;
     inputs.pivotVelocity = 0.0;
     inputs.pivotAppliedVolts = lastDuty * 12.0;
-    inputs.pivotCurrentAmps = Math.abs(lastDuty) * 3.0;
+    inputs.pivotStatorCurrentAmps = Math.abs(lastDuty) * 3.0;
+    inputs.pivotSupplyCurrentAmps = Math.abs(lastDuty) * 3.0;
   }
 
   @Override
@@ -25,4 +26,9 @@ public class HoodIOSim implements HoodIO {
   public void setDutyCycleOutput(double duty) {
     lastDuty = duty;
   }
+
+  public void setVoltage(double volts) {}
+
+  @Override
+  public void resetEncoder(double position) {}
 }

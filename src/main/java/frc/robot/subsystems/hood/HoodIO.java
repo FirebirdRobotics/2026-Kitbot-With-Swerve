@@ -10,7 +10,8 @@ public interface HoodIO {
     public double pivotPosition = 0.0;
     public double pivotVelocity = 0.0;
     public double pivotAppliedVolts = 0.0;
-    public double pivotCurrentAmps = 0.0;
+    public double pivotStatorCurrentAmps = 0.0;
+    public double pivotSupplyCurrentAmps = 0.0;
   }
 
   /** Update the set of loggable inputs. */
@@ -21,4 +22,8 @@ public interface HoodIO {
 
   /** Run the pivot motor in open loop duty cycle -1.0..1.0. */
   public default void setDutyCycleOutput(double duty) {}
+
+  void setVoltage(double volts);
+
+  void resetEncoder(double position);
 }
