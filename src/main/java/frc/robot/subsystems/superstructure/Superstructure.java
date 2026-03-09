@@ -26,6 +26,7 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.superstructure.SuperstructureConstants.SpeedInterpolationMap;
+import frc.robot.subsystems.superstructure.SuperstructureConstants.HoodInterpolationMap;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -144,6 +145,50 @@ public class Superstructure extends SubsystemBase {
     // Find parabola angle to compensate for horizontal speed
     double pitch =
         Math.acos(Math.min(shot.getNorm() / SuperstructureConstants.totalExitVelocity, 1.0));
+
+    // Parallel because drive at angle takes a while to terminate
+    return Commands.parallel(
+        DriveCommands.joystickDriveAtAngle(
+            drive, xSupplier, ySupplier, () -> new Rotation2d(angle)),
+        hood.CommandGoToAngle(pitch),
+        Commands.sequence(shooter.setVelocityCommand(totalExitVelocity),
+                          Commands.waitSeconds(1),
+                          shooter.setVelocityCommand(0));
+  }
+}
+
+public Command shootOnTheFlyNew(
+      Drive drive,
+      Hood hood,
+      Shooter shooter,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      Supplier<Translation2d> gSupplier) {
+    // This maps distance to hood angle
+    // To tune this, set the hood angle to different angles and measure shot distance
+    // Try a decent amount of angles (say every 10 degrees), a couple of times so it can average it
+    
+    final HoodInterpolationMap hoodAngleMap =
+        (new SuperstructureConstants()).new HoodInterpolationMap();
+
+    ChassisSpeeds robotSpeeds = drive.getChassisSpeeds();
+
+    // Calculate where robot will be once we're done processing and actually ready to shoot
+    Translation2d futurePose =
+        drive
+            .getPose()
+            .getTranslation()
+            .plus(
+                new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond)
+                    .times(SuperstructureConstants.latency));
+
+    // offset
+    Translation2d target = gSupplier.get().minus(futurePose);
+
+    double angle = target.getAngle().getRadians();
+
+    // Find parabola angle to compensate for horizontal speed
+    double pitch = hoodAngleMap.get(target.getNorm());
 
     // Parallel because drive at angle takes a while to terminate
     return Commands.parallel(
