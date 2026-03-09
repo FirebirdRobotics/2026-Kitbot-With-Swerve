@@ -302,6 +302,8 @@ public class RobotContainer {
         .whileTrue(
             superstructure.shootOnTheFly(
                 drive,
+                hood,
+                shooter,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
                 () ->
