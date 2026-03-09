@@ -7,5 +7,5 @@ public class HoodConstants {
 
   // Example base/limit angles (keep in same units used by your control loops)
   public static final double lowestAngle = 17; // 16.973 then 17.32
-  public static final double highestAngle = 48; // 79.5
+  public static final double highestAngle = 47; // 48
 }
