@@ -23,6 +23,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.hood.Hood;
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.superstructure.SuperstructureConstants.SpeedInterpolationMap;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -102,13 +104,10 @@ public class Superstructure extends SubsystemBase {
         });
   }
 
-  public Command setHoodAngle(double angle) {
-    angle = angle + 1;
-    return Commands.none();
-  }
-
   public Command shootOnTheFly(
       Drive drive,
+      Hood hood,
+      Shooter shooter,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       Supplier<Translation2d> gSupplier) {
@@ -150,7 +149,9 @@ public class Superstructure extends SubsystemBase {
     return Commands.parallel(
         DriveCommands.joystickDriveAtAngle(
             drive, xSupplier, ySupplier, () -> new Rotation2d(angle)),
-        setHoodAngle(pitch),
-        launchAtVelocity(totalExitVelocity));
+        hood.CommandGoToAngle(pitch),
+        Commands.sequence(shooter.setVelocityCommand(totalExitVelocity),
+                          Commands.waitSeconds(1),
+                          shooter.setVelocityCommand(0));
   }
 }
