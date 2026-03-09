@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
+import java.util.function.Supplier;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
@@ -35,17 +36,17 @@ public final class Constants {
   }
 
   // Alliance
-  public static final Alliance alliance = DriverStation.getAlliance().isPresent()
+  public static final Supplier<Alliance> alliance = () -> DriverStation.getAlliance().isPresent()
                                 ? DriverStation.getAlliance().get()
                                 : Alliance.Red;
 
   // Helper functions
   public static final Translation2d mirrorAlliance(Translation2d t) {
-    return (alliance == Alliance.Blue) ? t : new Translation2d(16.540988 - t.getX(), 8.069326 - t.getY());
+    return (alliance.get() == Alliance.Blue) ? t : new Translation2d(16.540988 - t.getX(), 8.069326 - t.getY());
   }
 
   public static final Pose2d mirrorAlliance(Pose2d t) {
-    return (alliance == Alliance.Blue) ? t : new Pose2d(new Translation2d(16.540988 - t.getTranslation().getX(), 8.069326 - t.getTranslation().getY()), t.getRotation());
+    return (alliance.get() == Alliance.Blue) ? t : new Pose2d(new Translation2d(16.540988 - t.getTranslation().getX(), 8.069326 - t.getTranslation().getY()), t.getRotation());
   }
 
   // Field measurements

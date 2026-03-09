@@ -10,7 +10,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -100,7 +99,7 @@ public class Robot extends LoggedRobot {
 
     // Set hood to lowest when in proximity of trench (1 m range)
     if(Math.abs(currentPose.getTranslation().minus(Constants.nearTrenchTarget).getY()) <= 1
-        || Math.abs(currentPose.getTranslation().minus(Constants.farTrenchTarget)).getY()) <= 1){
+        || Math.abs(currentPose.getTranslation().minus(Constants.farTrenchTarget).getY()) <= 1){
       CommandScheduler.getInstance().schedule(robotContainer.hood.CommandGoToLowestAngle());
     }
 

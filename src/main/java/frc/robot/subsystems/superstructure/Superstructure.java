@@ -153,9 +153,8 @@ public class Superstructure extends SubsystemBase {
         hood.CommandGoToAngle(pitch),
         Commands.sequence(shooter.setVelocityCommand(totalExitVelocity),
                           Commands.waitSeconds(1),
-                          shooter.setVelocityCommand(0));
+                          shooter.setVelocityCommand(0)));
   }
-}
 
 public Command shootOnTheFlyNew(
       Drive drive,
@@ -167,7 +166,7 @@ public Command shootOnTheFlyNew(
     // This maps distance to hood angle
     // To tune this, set the hood angle to different angles and measure shot distance
     // Try a decent amount of angles (say every 10 degrees), a couple of times so it can average it
-    
+
     final HoodInterpolationMap hoodAngleMap =
         (new SuperstructureConstants()).new HoodInterpolationMap();
 
@@ -197,6 +196,6 @@ public Command shootOnTheFlyNew(
         hood.CommandGoToAngle(pitch),
         Commands.sequence(shooter.setVelocityCommand(totalExitVelocity),
                           Commands.waitSeconds(1),
-                          shooter.setVelocityCommand(0));
+                          shooter.setVelocityCommand(0)));
   }
 }
