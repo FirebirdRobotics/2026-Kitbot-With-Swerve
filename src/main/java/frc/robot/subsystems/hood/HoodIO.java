@@ -23,7 +23,14 @@ public interface HoodIO {
   /** Run the pivot motor in open loop duty cycle -1.0..1.0. */
   public default void setDutyCycleOutput(double duty) {}
 
-  void setVoltage(double volts);
+  /** Set an open-loop voltage on the pivot motor (default: no-op). */
+  public default void setVoltage(double volts) {}
 
-  void resetEncoder(double position);
+  /** Reset the pivot encoder to the given position (default: no-op). */
+  public default void resetEncoder(double position) {}
+
+  /** Reset the pivot encoder to 0.0 (convenience default). */
+  public default void resetEncoder() {
+    resetEncoder(0.0);
+  }
 }

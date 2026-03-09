@@ -22,7 +22,7 @@ public class Hood extends SubsystemBase {
 
   private LinearFilter currentFilter = LinearFilter.movingAverage(5);
 
-  public static final double ZEROING_CURRENT_THRESHOLD_AMPS = 50;
+  public static final double ZEROING_CURRENT_THRESHOLD_AMPS = 15; // was usually barely over 16
 
   @AutoLogOutput(key = "Hood/Current Filter Value")
   private double currentFilterValue = 0.0;
@@ -54,10 +54,14 @@ public class Hood extends SubsystemBase {
   public Command runCurrentZeroing() {
     return this.run(
             () -> {
-              io.setVoltage(-2.0);
+              io.setVoltage(-0.5);
             })
         .until(() -> Math.abs(currentFilterValue) > ZEROING_CURRENT_THRESHOLD_AMPS)
-        .andThen(Commands.parallel(Commands.print("Hood Zeroed"), rezero()));
+        .andThen(Commands.parallel(Commands.print("Hood Zeroed"), rezero()))
+        .andThen(
+            () -> {
+              io.setVoltage(0.0);
+            });
   }
 
   public Command rezero() {
@@ -65,12 +69,13 @@ public class Hood extends SubsystemBase {
     return Commands.runOnce(
         () ->
             io.resetEncoder(
-                0.0)); // Set this to 16.778206 when correcting shooter setpoint units later
+                16.778206)); // Set this to 16.778206 when correcting shooter setpoint units later
   }
 
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+
     // Log individual fields to avoid a hard dependency on the autolog-generated
     // "AutoLogged" wrapper type (which may not be present if the annotation
     // processor hasn't run). Using explicit recordOutput calls keeps logging
@@ -81,6 +86,8 @@ public class Hood extends SubsystemBase {
     Logger.recordOutput("Hood/AppliedVolts", inputs.pivotAppliedVolts);
     Logger.recordOutput("Hood/StatorCurrentAmps", inputs.pivotStatorCurrentAmps);
     Logger.recordOutput("Hood/SupplyCurrentAmps", inputs.pivotSupplyCurrentAmps);
+
+    // Update moving-average of stator current used for zeroing detection
     currentFilterValue = currentFilter.calculate(inputs.pivotStatorCurrentAmps);
   }
 }

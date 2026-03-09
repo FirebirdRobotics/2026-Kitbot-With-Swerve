@@ -25,25 +25,6 @@ public class Transfer extends SubsystemBase {
     return runOnce(() -> setRollerMotorPercentOutput(power * -1));
   }
 
-  /**
-   * Start rolling forwards until the command ends; stops when ended. Useful for binding to a button
-   * as a while-held command.
-   */
-  public Command startRollForwardsCommand(double power) {
-    return runEnd(() -> setRollerMotorPercentOutput(power), () -> setRollerMotorPercentOutput(0));
-  }
-
-  /** Start rolling backwards until the command ends; stops when ended. */
-  public Command startRollBackwardsCommand(double power) {
-    return runEnd(
-        () -> setRollerMotorPercentOutput(power * -1), () -> setRollerMotorPercentOutput(0));
-  }
-
-  /** Stop the rollers immediately. */
-  public Command stopRollersCommand() {
-    return runOnce(() -> setRollerMotorPercentOutput(0));
-  }
-
   @Override
   public void periodic() {
     io.updateInputs(inputs);

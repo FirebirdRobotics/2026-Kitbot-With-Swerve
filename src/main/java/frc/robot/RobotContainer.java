@@ -7,8 +7,6 @@
 
 package frc.robot;
 
-import static frc.robot.subsystems.superstructure.SuperstructureConstants.controlSystemsVelocityRadPerSec;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -313,19 +311,7 @@ public class RobotContainer {
                         ? Constants.redHubTarget
                         : Constants.blueHubTarget));
 
-    controller
-        .y()
-        .whileTrue(
-            Commands.startEnd(
-                () -> {
-                  superstructure.io.setIntakeLauncherVelocity(controlSystemsVelocityRadPerSec);
-                  superstructure.io.setFeederVoltage(10);
-                },
-                () -> {
-                  superstructure.io.setIntakeLauncherVoltage(0);
-                  superstructure.io.setFeederVoltage(0);
-                },
-                superstructure));
+    controller.y().onTrue(hood.runCurrentZeroing());
   }
 
   /**
