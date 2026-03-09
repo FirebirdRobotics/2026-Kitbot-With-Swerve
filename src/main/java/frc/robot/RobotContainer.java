@@ -69,15 +69,15 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
   // Subsystems
-  private final Drive drive;
-  private final Superstructure superstructure;
-  private final Vision vision;
-  private final Intake intake;
-  private final Hood hood;
-  private final Shooter shooter;
-  private final Transfer transfer;
-  private final FloorRollers floorRollers;
-  private final DiagonAlley diagonAlley;
+  public final Drive drive;
+  public final Superstructure superstructure;
+  public final Vision vision;
+  public final Intake intake;
+  public final Hood hood;
+  public final Shooter shooter;
+  public final Transfer transfer;
+  public final FloorRollers floorRollers;
+  public final DiagonAlley diagonAlley;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);

@@ -37,6 +37,7 @@ public final class Constants {
   public static Translation2d blueHubTarget = new Translation2d(4.625594, 4.034536);
   public static Translation2d redHubTarget =
       new Translation2d(16.540988 - 4.625594, 8.069326 - 4.034536);
+  public static Translation2d trenchTarget = new Translation2d(4.611624, 0.650748);
 
   // Autonomous constants
   public static Pose2d autonomousDestination = new Pose2d(2, 2, new Rotation2d(0.5));
