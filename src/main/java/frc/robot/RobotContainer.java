@@ -232,13 +232,7 @@ public class RobotContainer {
                 drive,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
-                () ->
-                    (DriverStation.getAlliance().isPresent()
-                                ? DriverStation.getAlliance().get()
-                                : Alliance.Red)
-                            == Alliance.Red
-                        ? Constants.redHubTarget
-                        : Constants.blueHubTarget));
+                () -> Constants.mirrorAlliance(Constants.hubTarget)));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -306,13 +300,7 @@ public class RobotContainer {
                 shooter,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
-                () ->
-                    (DriverStation.getAlliance().isPresent()
-                                ? DriverStation.getAlliance().get()
-                                : Alliance.Red)
-                            == Alliance.Red
-                        ? Constants.redHubTarget
-                        : Constants.blueHubTarget));
+                () -> Constants.mirrorAlliance(Constants.hubTarget)));
 
     controller.y().onTrue(hood.runCurrentZeroing());
   }

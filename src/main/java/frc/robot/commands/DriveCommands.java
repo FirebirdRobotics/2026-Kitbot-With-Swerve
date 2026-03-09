@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.Constants;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -317,7 +318,7 @@ public class DriveCommands {
 
   /* Autonomously drives to target pose */
   public static Command autoDriveToPose(Drive drive, Pose2d targetPose2d) {
-    APTarget target = new APTarget(targetPose2d);
+    APTarget target = new APTarget(Constants.mirrorAlliance(targetPose2d));
     ProfiledPIDController angleController =
         new ProfiledPIDController(5, 0.0, .4, new TrapezoidProfile.Constraints(40, 100));
     angleController.enableContinuousInput(-Math.PI, Math.PI);

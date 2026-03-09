@@ -99,7 +99,7 @@ public class Robot extends LoggedRobot {
     m_field.setRobotPose(currentPose);
 
     // Set hood to lowest when in proximity of trench (1 m range)
-    if(currentPose.getTranslation().getDistance(Constants.trenchTarget) <= 1){
+    if(currentPose.getTranslation().minus(Constants.mirrorAlliance(Constants.trenchTarget)).getY() <= 1){
       CommandScheduler.getInstance().schedule(robotContainer.hood.CommandGoToLowestAngle());
     }
 
