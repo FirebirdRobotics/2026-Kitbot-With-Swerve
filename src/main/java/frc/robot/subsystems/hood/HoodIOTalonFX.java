@@ -39,7 +39,7 @@ public class HoodIOTalonFX implements HoodIO {
     var pivotConfig = new TalonFXConfiguration();
     pivotConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     pivotConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
-    pivotConfig.Feedback.SensorToMechanismRatio = 4.0;
+    pivotConfig.Feedback.SensorToMechanismRatio = 1 / 5.294;
 
     pivotConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     pivotConfig.CurrentLimits.SupplyCurrentLimit = 50;

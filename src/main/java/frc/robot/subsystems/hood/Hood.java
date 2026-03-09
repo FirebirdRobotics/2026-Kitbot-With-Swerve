@@ -22,7 +22,7 @@ public class Hood extends SubsystemBase {
 
   private LinearFilter currentFilter = LinearFilter.movingAverage(5);
 
-  public static final double ZEROING_CURRENT_THRESHOLD_AMPS = 15; // was usually barely over 16
+  public static final double ZEROING_CURRENT_THRESHOLD_AMPS = 15.9; // was usually barely over 16
 
   @AutoLogOutput(key = "Hood/Current Filter Value")
   private double currentFilterValue = 0.0;

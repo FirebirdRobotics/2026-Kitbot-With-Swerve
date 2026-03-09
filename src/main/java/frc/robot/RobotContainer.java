@@ -133,6 +133,7 @@ public class RobotContainer {
         floorRollers = new FloorRollers(new FloorRollersIOTalonFX() {});
         diagonAlley = new DiagonAlley(new DiagonAlleyIOTalonFX() {});
 
+        hood.rezero();
         break;
 
       case SIM:
