@@ -25,8 +25,8 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.superstructure.SuperstructureConstants.SpeedInterpolationMap;
 import frc.robot.subsystems.superstructure.SuperstructureConstants.HoodInterpolationMap;
+import frc.robot.subsystems.superstructure.SuperstructureConstants.SpeedInterpolationMap;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -151,12 +151,13 @@ public class Superstructure extends SubsystemBase {
         DriveCommands.joystickDriveAtAngle(
             drive, xSupplier, ySupplier, () -> new Rotation2d(angle)),
         hood.CommandGoToAngle(pitch),
-        Commands.sequence(shooter.setVelocityCommand(totalExitVelocity),
-                          Commands.waitSeconds(1),
-                          shooter.setVelocityCommand(0)));
+        Commands.sequence(
+            shooter.setVelocityCommand(totalExitVelocity),
+            Commands.waitSeconds(1),
+            shooter.setVelocityCommand(0)));
   }
 
-public Command shootOnTheFlyNew(
+  public Command shootOnTheFlyNew(
       Drive drive,
       Hood hood,
       Shooter shooter,
@@ -194,8 +195,9 @@ public Command shootOnTheFlyNew(
         DriveCommands.joystickDriveAtAngle(
             drive, xSupplier, ySupplier, () -> new Rotation2d(angle)),
         hood.CommandGoToAngle(pitch),
-        Commands.sequence(shooter.setVelocityCommand(totalExitVelocity),
-                          Commands.waitSeconds(1),
-                          shooter.setVelocityCommand(0)));
+        Commands.sequence(
+            shooter.setVelocityCommand(totalExitVelocity),
+            Commands.waitSeconds(1),
+            shooter.setVelocityCommand(0)));
   }
 }

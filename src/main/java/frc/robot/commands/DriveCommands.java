@@ -29,8 +29,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.drive.Drive;
 import frc.robot.Constants;
+import frc.robot.subsystems.drive.Drive;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -164,9 +164,12 @@ public class DriveCommands {
 
         // Reset PID controller when command starts
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()))
-        .finallyDo(() -> {
-          SmartDashboard.putNumber("dTheta (align)", rotationSupplier.get().getRadians() - drive.getPose().getRotation().getRadians());
-        });
+        .finallyDo(
+            () -> {
+              SmartDashboard.putNumber(
+                  "dTheta (align)",
+                  rotationSupplier.get().getRadians() - drive.getPose().getRotation().getRadians());
+            });
   }
 
   /**
@@ -346,12 +349,16 @@ public class DriveCommands {
         .finallyDo(
             () -> {
               drive.stop();
-              SmartDashboard.putNumber("dTheta (auto)", Constants.mirrorAlliance(targetPose2d).getRotation().getRadians() - drive.getPose().getRotation().getRadians());
-              SmartDashboard.putNumberArray("dX/dY (auto)",
-                new Double[]{
-                  Constants.mirrorAlliance(targetPose2d).getX() - drive.getPose().getX(),
-                  Constants.mirrorAlliance(targetPose2d).getY() - drive.getPose().getY()
-                });
+              SmartDashboard.putNumber(
+                  "dTheta (auto)",
+                  Constants.mirrorAlliance(targetPose2d).getRotation().getRadians()
+                      - drive.getPose().getRotation().getRadians());
+              SmartDashboard.putNumberArray(
+                  "dX/dY (auto)",
+                  new Double[] {
+                    Constants.mirrorAlliance(targetPose2d).getX() - drive.getPose().getX(),
+                    Constants.mirrorAlliance(targetPose2d).getY() - drive.getPose().getY()
+                  });
             });
   }
 
