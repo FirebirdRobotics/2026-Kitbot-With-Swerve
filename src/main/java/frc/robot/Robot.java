@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -93,7 +94,14 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
 
     // Push latest pose to SmartDashboard
-    m_field.setRobotPose(robotContainer.getPose2d());
+    Pose2d currentPose = robotContainer.getPose2d();
+    m_field.setRobotPose(currentPose);
+
+    // Set hood to lowest when in proximity of trench (1 m range)
+    if (Math.abs(currentPose.getTranslation().minus(Constants.nearTrenchTarget).getY()) <= 1
+        || Math.abs(currentPose.getTranslation().minus(Constants.farTrenchTarget).getY()) <= 1) {
+      CommandScheduler.getInstance().schedule(robotContainer.hood.CommandGoToLowestAngle());
+    }
 
     // Return to non-RT thread priority (do not modify the first argument)
     // Threads.setCurrentThreadPriority(false, 10);

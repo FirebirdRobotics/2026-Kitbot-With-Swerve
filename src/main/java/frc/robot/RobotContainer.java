@@ -10,8 +10,6 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -69,15 +67,15 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
   // Subsystems
-  private final Drive drive;
-  private final Superstructure superstructure;
-  private final Vision vision;
-  private final Intake intake;
-  private final Hood hood;
-  private final Shooter shooter;
-  private final Transfer transfer;
-  private final FloorRollers floorRollers;
-  private final DiagonAlley diagonAlley;
+  public final Drive drive;
+  public final Superstructure superstructure;
+  public final Vision vision;
+  public final Intake intake;
+  public final Hood hood;
+  public final Shooter shooter;
+  public final Transfer transfer;
+  public final FloorRollers floorRollers;
+  public final DiagonAlley diagonAlley;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -232,13 +230,7 @@ public class RobotContainer {
                 drive,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
-                () ->
-                    (DriverStation.getAlliance().isPresent()
-                                ? DriverStation.getAlliance().get()
-                                : Alliance.Red)
-                            == Alliance.Red
-                        ? Constants.redHubTarget
-                        : Constants.blueHubTarget));
+                () -> Constants.mirrorAlliance(Constants.hubTarget)));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -302,15 +294,11 @@ public class RobotContainer {
         .whileTrue(
             superstructure.shootOnTheFly(
                 drive,
+                hood,
+                shooter,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
-                () ->
-                    (DriverStation.getAlliance().isPresent()
-                                ? DriverStation.getAlliance().get()
-                                : Alliance.Red)
-                            == Alliance.Red
-                        ? Constants.redHubTarget
-                        : Constants.blueHubTarget));
+                () -> Constants.mirrorAlliance(Constants.hubTarget)));
 
     controller.y().onTrue(hood.runCurrentZeroing());
   }
