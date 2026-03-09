@@ -163,7 +163,10 @@ public class DriveCommands {
             drive)
 
         // Reset PID controller when command starts
-        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()))
+        .finallyDo(() -> {
+          SmartDashboard.putNumber("dTheta (align)", rotationSupplier.get().getRadians() - drive.getPose().getRotation().getRadians());
+        });
   }
 
   /**
@@ -330,8 +333,6 @@ public class DriveCommands {
               Pose2d currentPose = drive.getPose();
               Autopilot.APResult rawOutput = autopilot.calculate(currentPose, robotSpeeds, target);
 
-              SmartDashboard.putNumber("AUto Active", 1);
-
               drive.runVelocity(
                   new ChassisSpeeds(
                       rawOutput.vx().baseUnitMagnitude(),
@@ -345,7 +346,12 @@ public class DriveCommands {
         .finallyDo(
             () -> {
               drive.stop();
-              SmartDashboard.putNumber("AUto Active", 0);
+              SmartDashboard.putNumber("dTheta (auto)", Constants.mirrorAlliance(targetPose2d).getRotation().getRadians() - drive.getPose().getRotation().getRadians());
+              SmartDashboard.putNumberArray("dX/dY (auto)",
+                new Double[]{
+                  Constants.mirrorAlliance(targetPose2d).getX() - drive.getPose().getX(),
+                  Constants.mirrorAlliance(targetPose2d).getY() - drive.getPose().getY()
+                });
             });
   }
 
