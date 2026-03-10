@@ -79,9 +79,10 @@ public class Robot extends LoggedRobot {
     robotContainer = new RobotContainer();
   }
 
-  /** This function is called periodically during all modes. */
+  /* Tracker to avoid double-setting hood angle */
   boolean zeroed = false;
 
+  /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
     // Optionally switch the thread to high priority to improve loop
