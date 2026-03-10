@@ -11,7 +11,6 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.util.Units;
 
 public class VisionConstants {
   // AprilTag layout
@@ -29,13 +28,13 @@ public class VisionConstants {
           31.5/100,
           -27.5/100,
           17.5/100,
-          new Rotation3d(Math.toRadians(26.336203), Math.toRadians(19.902164), Math.toRadians(20)));
+          new Rotation3d(Math.toRadians(26.336203), Math.toRadians(19.902164), Math.toRadians(22.323777)));
   public static Transform3d robotToCameraLeft =
       new Transform3d(
           31.5/100,
           27.5/100,
           17.5/100,
-          new Rotation3d(Math.toRadians(26.336203), Math.toRadians(-19.902164), Math.toRadians(-20)));
+          new Rotation3d(Math.toRadians(26.336203), Math.toRadians(-19.902164), Math.toRadians(-22.323777)));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;

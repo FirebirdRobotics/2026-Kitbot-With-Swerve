@@ -294,14 +294,15 @@ public class RobotContainer {
     // controller.rightTrigger().whileTrue(superstructure.eject());
     controller
         .rightTrigger()
-        .onTrue(
+        .whenTrue(
             superstructure.shootOnTheFly(
                 drive,
                 hood,
                 shooter,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
-                () -> Constants.mirrorAlliance(Constants.hubTarget)));
+                () -> Constants.mirrorAlliance(Constants.hubTarget)))
+        .onFalse(hood.CommandGoToLowestAngle());
 
     controller.y().onTrue(hood.runCurrentZeroing());
   }
