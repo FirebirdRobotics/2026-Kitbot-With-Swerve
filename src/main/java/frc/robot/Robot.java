@@ -81,6 +81,7 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during all modes. */
   boolean zeroed = false;
+
   @Override
   public void robotPeriodic() {
     // Optionally switch the thread to high priority to improve loop
@@ -101,12 +102,11 @@ public class Robot extends LoggedRobot {
     // Set hood to lowest when in proximity of trench (1 m range)
     if (Math.abs(currentPose.getTranslation().minus(Constants.nearTrenchTarget).getY()) <= 1
         || Math.abs(currentPose.getTranslation().minus(Constants.farTrenchTarget).getY()) <= 1) {
-      if(!zeroed){
+      if (!zeroed) {
         CommandScheduler.getInstance().schedule(robotContainer.hood.CommandGoToLowestAngle());
         zeroed = true;
       }
-    }
-    else{
+    } else {
       zeroed = false;
     }
 

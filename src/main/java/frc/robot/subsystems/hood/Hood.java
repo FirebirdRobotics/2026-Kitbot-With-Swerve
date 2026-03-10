@@ -44,10 +44,12 @@ public class Hood extends SubsystemBase {
   }
 
   public Command CommandGoToAngle(double angle) {
-    return runOnce(() -> goToAngle(
-      (angle < HoodConstants.lowestAngle) ? HoodConstants.lowestAngle
-        : ((angle > HoodConstants.highestAngle) ? HoodConstants.highestAngle : angle)
-    ));
+    return runOnce(
+        () ->
+            goToAngle(
+                (angle < HoodConstants.lowestAngle)
+                    ? HoodConstants.lowestAngle
+                    : ((angle > HoodConstants.highestAngle) ? HoodConstants.highestAngle : angle)));
   }
 
   public Command CommandGoToLowestAngle() {

@@ -19,11 +19,18 @@ public class VisionConstants {
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
   // Camera names, must match names configured on coprocessor
-  public static String cameraName = "FrontCam";
+  public static String cameraNameRight = "RightCam";
+  public static String cameraNameLeft = "LeftCam";
 
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
-  public static Transform3d robotToCamera =
+  public static Transform3d robotToCameraRight =
+      new Transform3d(
+          Units.inchesToMeters(-12.559),
+          Units.inchesToMeters(-10.054),
+          Units.inchesToMeters(23.439),
+          new Rotation3d(0.0, 0, Math.toRadians(20)));
+  public static Transform3d robotToCameraLeft =
       new Transform3d(
           Units.inchesToMeters(-12.559),
           Units.inchesToMeters(-10.054),
@@ -43,7 +50,8 @@ public class VisionConstants {
   // (Adjust to trust some cameras more than others)
   public static double[] cameraStdDevFactors =
       new double[] {
-        1.0 // FrontCam
+        1.0, // right
+        1.0  // left
       };
 
   // Multipliers to apply for MegaTag 2 observations

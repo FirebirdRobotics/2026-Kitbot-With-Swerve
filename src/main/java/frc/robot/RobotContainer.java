@@ -56,7 +56,6 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
-import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -103,7 +102,9 @@ public class RobotContainer {
             new Vision(
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVision(
-                    VisionConstants.cameraName, VisionConstants.robotToCamera));
+                    VisionConstants.cameraNameRight, VisionConstants.robotToCameraRight),
+                new VisionIOPhotonVision(
+                    VisionConstants.cameraNameLeft, VisionConstants.robotToCameraLeft));
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -147,8 +148,10 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.cameraName, VisionConstants.robotToCamera, drive::getPose));
+                new VisionIOPhotonVision(
+                    VisionConstants.cameraNameRight, VisionConstants.robotToCameraRight),
+                new VisionIOPhotonVision(
+                    VisionConstants.cameraNameLeft, VisionConstants.robotToCameraLeft));
 
         superstructure = new Superstructure(new SuperstructureIOSim());
         intake = new Intake(new IntakeIOSim());
