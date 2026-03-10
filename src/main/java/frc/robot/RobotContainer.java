@@ -202,6 +202,8 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Current Zeroing", hood.runCurrentZeroing());
     autoChooser.addDefaultOption(
         "Drive to Start Pose",
         DriveCommands.autoDriveToPose(drive, Constants.autonomousDestination));
