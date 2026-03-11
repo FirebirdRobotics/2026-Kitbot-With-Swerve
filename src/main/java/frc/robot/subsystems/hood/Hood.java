@@ -74,7 +74,7 @@ public class Hood extends SubsystemBase {
     return Commands.runOnce(
         () ->
             io.resetEncoder(
-                16.778206)); // Set this to 16.778206 when correcting shooter setpoint units later
+                0)); // Set this to 16.778206 when correcting shooter setpoint units later
   }
 
   @Override

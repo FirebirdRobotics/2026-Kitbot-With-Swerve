@@ -33,6 +33,7 @@ import frc.robot.subsystems.floorRollers.FloorRollersIO;
 import frc.robot.subsystems.floorRollers.FloorRollersIOSim;
 import frc.robot.subsystems.floorRollers.FloorRollersIOTalonFX;
 import frc.robot.subsystems.hood.Hood;
+import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.hood.HoodIO;
 import frc.robot.subsystems.hood.HoodIOSim;
 import frc.robot.subsystems.hood.HoodIOTalonFX;
@@ -202,8 +203,7 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Current Zeroing", hood.runCurrentZeroing());
+    autoChooser.addOption("Current Zeroing", hood.runCurrentZeroing());
     autoChooser.addDefaultOption(
         "Drive to Start Pose",
         DriveCommands.autoDriveToPose(drive, Constants.autonomousDestination));
@@ -273,23 +273,28 @@ public class RobotContainer {
     // controller.leftBumper().onTrue(shooter.setVelocityCommand(5)); // Test angle
     // controller.leftBumper().onFalse(shooter.setVelocityCommand(0));
 
+    // controller
+    //     .leftBumper()
+    //     .onTrue(
+    //         Commands.parallel(
+    //             transfer.manualRollBackward(0.6),
+    //             floorRollers.rollInwardsCommand(0.7),
+    //             shooter.setVelocityCommand(25),
+    //             diagonAlley.rollOutwards(0.3)));
+    // controller
+    //     .leftBumper()
+    //     .onFalse(
+    //         Commands.parallel(
+    //             transfer.manualRollForwards(0),
+    //             floorRollers.rollInwardsCommand(0),
+    //             shooter.setVelocityCommand(0),
+    //             diagonAlley.Break(0)));
+    // controller.leftBumper().onFalse(shooter.setVelocityCommand(0));
+
     controller
         .leftBumper()
-        .onTrue(
-            Commands.parallel(
-                transfer.manualRollBackward(0.6),
-                floorRollers.rollInwardsCommand(0.7),
-                shooter.setVelocityCommand(25),
-                diagonAlley.rollOutwards(0.3)));
-    controller
-        .leftBumper()
-        .onFalse(
-            Commands.parallel(
-                transfer.manualRollForwards(0),
-                floorRollers.rollInwardsCommand(0),
-                shooter.setVelocityCommand(0),
-                diagonAlley.Break(0)));
-    controller.leftBumper().onFalse(shooter.setVelocityCommand(0));
+        .onTrue(hood.CommandGoToAngle(HoodConstants.highestAngle - 0.5)); // Test angle
+    controller.leftBumper().onFalse(hood.CommandGoToLowestAngle());
 
     // controller.rightBumper().whileTrue(intake.goToFramePerimeterPositionCommand());
 
