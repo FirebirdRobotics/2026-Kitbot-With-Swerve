@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants;
 import frc.robot.subsystems.drive.Drive;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -131,38 +132,56 @@ public class DriveCommands {
             new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
     angleController.enableContinuousInput(-Math.PI, Math.PI);
 
-    // Construct command
-    return Commands.run(
-            () -> {
-              // Get linear velocity
-              Translation2d linearVelocity =
-                  getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+    // Single command that computes velocities and updates the dashboard while
+    // owning the Drive subsystem. This avoids creating two commands that both
+    // require the same subsystem.
+    Command driveCommandAndDashboard =
+        Commands.run(
+                () -> {
+                  // Get linear velocity
+                  Translation2d linearVelocity =
+                      getLinearVelocityFromJoysticks(
+                          xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
-              // Calculate angular speed
-              double omega =
-                  angleController.calculate(
-                      drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
+                  // Calculate angular speed
+                  double omega =
+                      angleController.calculate(
+                          drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
 
-              // Convert to field relative speeds & send command
-              ChassisSpeeds speeds =
-                  new ChassisSpeeds(
-                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                      omega);
-              boolean isFlipped =
-                  DriverStation.getAlliance().isPresent()
-                      && DriverStation.getAlliance().get() == Alliance.Red;
-              drive.runVelocity(
-                  ChassisSpeeds.fromFieldRelativeSpeeds(
-                      speeds,
-                      isFlipped
-                          ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                          : drive.getRotation()));
-            },
-            drive)
+                  // Convert to field relative speeds & send command
+                  ChassisSpeeds speeds =
+                      new ChassisSpeeds(
+                          linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                          linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                          omega);
+                  boolean isFlipped =
+                      DriverStation.getAlliance().isPresent()
+                          && DriverStation.getAlliance().get() == Alliance.Red;
+                  drive.runVelocity(
+                      ChassisSpeeds.fromFieldRelativeSpeeds(
+                          speeds,
+                          isFlipped
+                              ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                              : drive.getRotation()));
 
-        // Reset PID controller when command starts
-        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+                  // Dashboard updates (continuous while command runs)
+                  double currentTheta = drive.getPose().getRotation().getRadians();
+                  double targetTheta = rotationSupplier.get().getRadians();
+                  SmartDashboard.putNumber("dTheta (align)", targetTheta - currentTheta);
+                  SmartDashboard.putNumber("dTheta (align) CurrentTheta", currentTheta);
+                  SmartDashboard.putNumber("dTheta (align) TargetTheta", targetTheta);
+                },
+                drive)
+            // Reset PID controller when command starts
+            .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()))
+            .finallyDo(
+                () ->
+                    SmartDashboard.putNumber(
+                        "dTheta (align)",
+                        rotationSupplier.get().getRadians()
+                            - drive.getPose().getRotation().getRadians()));
+
+    return driveCommandAndDashboard;
   }
 
   /**
@@ -317,7 +336,7 @@ public class DriveCommands {
 
   /* Autonomously drives to target pose */
   public static Command autoDriveToPose(Drive drive, Pose2d targetPose2d) {
-    APTarget target = new APTarget(targetPose2d);
+    APTarget target = new APTarget(Constants.mirrorAlliance(targetPose2d));
     ProfiledPIDController angleController =
         new ProfiledPIDController(5, 0.0, .4, new TrapezoidProfile.Constraints(40, 100));
     angleController.enableContinuousInput(-Math.PI, Math.PI);
@@ -328,8 +347,6 @@ public class DriveCommands {
               ChassisSpeeds robotSpeeds = drive.getChassisSpeeds();
               Pose2d currentPose = drive.getPose();
               Autopilot.APResult rawOutput = autopilot.calculate(currentPose, robotSpeeds, target);
-
-              SmartDashboard.putNumber("AUto Active", 1);
 
               drive.runVelocity(
                   new ChassisSpeeds(
@@ -344,7 +361,16 @@ public class DriveCommands {
         .finallyDo(
             () -> {
               drive.stop();
-              SmartDashboard.putNumber("AUto Active", 0);
+              SmartDashboard.putNumber(
+                  "dTheta (auto)",
+                  Constants.mirrorAlliance(targetPose2d).getRotation().getRadians()
+                      - drive.getPose().getRotation().getRadians());
+              SmartDashboard.putNumberArray(
+                  "dX/dY (auto)",
+                  new Double[] {
+                    Constants.mirrorAlliance(targetPose2d).getX() - drive.getPose().getX(),
+                    Constants.mirrorAlliance(targetPose2d).getY() - drive.getPose().getY()
+                  });
             });
   }
 

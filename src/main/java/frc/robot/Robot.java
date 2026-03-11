@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -76,7 +78,13 @@ public class Robot extends LoggedRobot {
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
+
+    // Add driver cam to SmartDashboard
+    CameraServer.startAutomaticCapture();
   }
+
+  /* Tracker to avoid double-setting hood angle */
+  boolean zeroed = false;
 
   /** This function is called periodically during all modes. */
   @Override
@@ -93,7 +101,19 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
 
     // Push latest pose to SmartDashboard
-    m_field.setRobotPose(robotContainer.getPose2d());
+    Pose2d currentPose = robotContainer.getPose2d();
+    m_field.setRobotPose(currentPose);
+
+    // Set hood to lowest when in proximity of trench (1 m range)
+    if (Math.abs(currentPose.getTranslation().minus(Constants.nearTrenchTarget).getY()) <= 1
+        || Math.abs(currentPose.getTranslation().minus(Constants.farTrenchTarget).getY()) <= 1) {
+      if (!zeroed) {
+        CommandScheduler.getInstance().schedule(robotContainer.hood.CommandGoToLowestAngle());
+        zeroed = true;
+      }
+    } else {
+      zeroed = false;
+    }
 
     // Return to non-RT thread priority (do not modify the first argument)
     // Threads.setCurrentThreadPriority(false, 10);
